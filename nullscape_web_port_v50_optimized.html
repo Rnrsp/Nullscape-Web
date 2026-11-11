@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Nullscape — Patch 5 Reconstruction v5.0 Optimized</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;overflow:hidden;background:#03050f;color:#fff;font-family:Trebuchet MS,Arial,sans-serif}canvas{display:block}#hud{pointer-events:none;position:absolute;inset:0}#top{position:absolute;top:20px;left:24px;display:flex;gap:14px;align-items:center}.brand{font-size:27px;letter-spacing:3px;color:#d6b8ff;text-shadow:0 0 14px #a745e6;font-weight:900}.pill{border:1px solid #a9a2ce77;background:#090c20ca;padding:10px 16px;border-radius:8px;letter-spacing:1px}.pill b{color:#ffdf79}#tip{position:absolute;top:22px;right:22px;max-width:380px;text-align:right;color:#c5c8ec;font-size:13px;line-height:1.7}#phase{position:absolute;top:78px;left:24px;color:#d0dafc;font-size:15px;letter-spacing:1.5px}#flash{position:absolute;top:29%;width:100%;text-align:center;font-size:clamp(24px,4vw,46px);font-weight:900;letter-spacing:5px;text-shadow:0 0 30px #b98eff;opacity:0;transition:opacity .2s}#cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#ffffff88;font-size:19px}#bottom{position:absolute;bottom:20px;left:24px;color:#a6a8d2;font-size:13px;line-height:1.8;background:#060918a8;padding:12px 15px;border:1px solid #8885b344;border-radius:9px}#ability{position:absolute;bottom:20px;right:24px;width:170px;text-align:center;background:#0b0d21bd;padding:11px;border-radius:8px;border:1px solid #ad9aec66}#meter{height:9px;background:#2b2a46;border-radius:5px;overflow:hidden;margin:9px 0}#fill{width:100%;height:100%;background:linear-gradient(90deg,#8b57e7,#91e4fd)}#veil{position:absolute;inset:0;background:#02040ab9;display:flex;justify-content:center;align-items:center;z-index:10}#panel{background:linear-gradient(140deg,#111832,#190d31);border:1px solid #a78cdd;box-shadow:0 0 70px #8243bf66;border-radius:15px;padding:32px;text-align:center;max-width:580px;width:calc(100% - 40px)}h1{font-size:44px;letter-spacing:5px;margin:0;color:#e7d1ff;text-shadow:0 0 25px #9861d1}h2{letter-spacing:3px}p{line-height:1.6;color:#d2d4ec}button{background:#7739c3;color:#fff;border:1px solid #bca0f7;border-radius:8px;padding:13px 24px;margin:7px;font-size:15px;font-weight:800;letter-spacing:1px;cursor:pointer}button:hover{background:#9657dc}button:disabled{opacity:.45;cursor:default}.hidden{display:none!important}.small{font-size:12px;color:#b4acd1}#toast{position:absolute;bottom:120px;width:100%;text-align:center;font-size:20px;color:#ffe9af;text-shadow:0 0 20px orange;opacity:0;transition:opacity .3s}@media(max-width:650px){#top{top:9px;left:10px;gap:5px;flex-wrap:wrap}.brand{font-size:17px}.pill{padding:5px 8px;font-size:12px}#tip{top:100px;right:10px;font-size:11px}#bottom{bottom:10px;left:10px;font-size:11px}#phase{top:60px;left:10px}}
+#panel{max-width:840px;max-height:90vh;overflow:auto}#panel .option-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0}#panel .choice{min-height:165px;border:1px solid #7663b2;background:linear-gradient(#272042,#100e25);padding:18px 11px;border-radius:12px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px}#panel .choice:hover:not(:disabled){border-color:#ffdb91;box-shadow:0 0 22px #8d57e366;background:#352657}#panel .choice:disabled{opacity:.38;cursor:not-allowed}#panel .choice strong{font-size:17px;letter-spacing:1px}#panel .choice em{font-style:normal;font-size:12px;color:#c8bee4;line-height:1.5}#panel .choice .cost{font-size:17px;color:#f8d779;font-weight:bold}.muted{color:#b9afce;font-size:13px}.golden{color:#ffd66b}.intermission-tag{font-size:12px;letter-spacing:3px;color:#a6b1ff;font-weight:bold}.shop-stat{font-size:13px;color:#d7c8f6}.wide{width:min(100%,370px)}@media(max-width:650px){#panel{padding:17px}#panel .option-grid{gap:5px}#panel .choice{padding:10px 5px;min-height:145px}#panel .choice strong{font-size:12px}#panel .choice em{font-size:10px}}
+
+#enemyCue{position:absolute;left:24px;top:205px;z-index:4;pointer-events:none;display:none;padding:18px 18px;min-width:228px;max-width:250px;text-align:center;border:3px solid #ffc34b;border-radius:14px;background:linear-gradient(180deg,#160f20f4,#0d0a14ee);box-shadow:0 0 34px #ffbd3768, inset 0 0 26px #ffffff0d;font-weight:900;letter-spacing:1.4px}#enemyCue .cueLamp{width:72px;height:72px;border-radius:50%;margin:6px auto 12px;background:#f3c94b;box-shadow:0 0 34px currentColor, inset 0 0 18px #ffffff55}#enemyCue .cueTitle{font-size:22px;letter-spacing:2.5px;margin-bottom:2px}#enemyCue .cueNumber{font-size:64px;line-height:1.02;text-shadow:0 0 26px currentColor}#enemyCue .cueInfo{font-size:14px;color:#f0e7fb;margin-top:8px;line-height:1.35;letter-spacing:1px}#minimap{position:absolute;right:22px;bottom:133px;width:190px;height:190px;border:1px solid #9c8dd480;background:#070918cb;border-radius:7px;box-shadow:0 0 20px #100b3688;image-rendering:crisp-edges}
+.class-picker{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;padding:12px 0 3px;color:#c7c0e6;font-size:12px;letter-spacing:2px}.class-picker label{display:flex;flex-direction:column;gap:7px;flex:1;min-width:180px}.class-picker select{background:#0c1029;border:1px solid #6f608f;color:#fff;border-radius:7px;padding:12px;letter-spacing:1px}#damage-flash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(transparent 35%,#f21d4670 95%);opacity:0;transition:opacity .15s}#classTag{position:absolute;right:23px;bottom:338px;color:#cab4ff;font-size:13px;letter-spacing:2px;text-shadow:0 0 12px #843cdd}#panel .score{font-size:38px;color:#f9d778;font-weight:900}#minimap-label{position:absolute;right:23px;bottom:326px;color:#9996bf;font-size:10px;letter-spacing:2px}
+@media(max-width:650px){#minimap{width:115px;height:115px;bottom:103px;right:9px}#minimap-label{bottom:220px;right:9px}#classTag{bottom:237px;right:9px}#ability{bottom:5px;right:9px;width:115px}#bottom{max-width:240px}}
+</style></head><body>
+<div id="hud"><div id="top"><span class="brand">NULLSCAPE <span style="font-size:10px;color:#b4adc7">PATCH 5 · v5.0</span></span><span class="pill">LEVEL <b id="level">1</b></span><span class="pill">GIFTS <b id="gifts">0 / 0</b></span><span class="pill">GOLD <b id="gold">0</b></span><span class="pill" id="collapsebar" style="display:none">COLLAPSE <b id="collapsepct">0%</b></span></div><div id="threats" style="position:absolute;top:115px;left:24px;color:#ffa0a8;font-size:12px;letter-spacing:1.5px;text-shadow:0 0 8px #f34">NO ACTIVE THREATS</div><div id="phase">FIND ALL THE GIFTS</div><div id="enemyCue"><div class="cueTitle" id="cueTitle"></div><div class="cueLamp" id="cueLamp"></div><div class="cueNumber" id="cueNumber"></div><div class="cueInfo" id="cueInfo"></div></div><div id="tip">Four paths. One way out.<br/>Collect gifts · escape through the Beacon.</div><div id="flash"></div><div id="toast"></div><div id="cross">·</div><div id="bottom"><b>W A S D</b> move &nbsp;·&nbsp; <b>SPACE</b> jump<br/><b>SHIFT</b> toggle shift-lock &nbsp;·&nbsp; <b>CTRL</b> sprint<br/><b>E</b> class ability (hold to aim/charge) &nbsp;·&nbsp; <b>Q</b> alt &nbsp;·&nbsp; <b>F</b> altar &nbsp;·&nbsp; <b>DRAG</b> orbit camera<br/><b>SCROLL</b> zoom &nbsp;·&nbsp; <b>T</b> cycle enemy test groups &nbsp;·&nbsp; <b>H</b> help &nbsp;·&nbsp; <b>ESC</b> release mouse</div><div id="ability"><span id="abilityname">ABILITY</span> <b>[E]</b><div id="meter"><div id="fill"></div></div><span id="dashstate">READY</span></div></div><canvas id="minimap" width="220" height="220"></canvas><div id="minimap-label">TOPOLOGY / COLLAPSE</div><div id="classTag">CHARGER</div><div id="interaction" style="position:absolute;top:64%;left:50%;transform:translateX(-50%);background:#0a091bdf;border:1px solid #bea4f2;padding:12px 20px;border-radius:10px;z-index:3;color:#f1e5ff;font-size:15px;letter-spacing:1px;display:none;pointer-events:none"></div><div id="runInfo" style="position:absolute;top:144px;left:24px;color:#c5bbdf;font-size:12px;line-height:1.7;text-shadow:0 2px 7px #000"></div><div id="giftGuide" style="position:absolute;left:50%;top:19%;transform:translateX(-50%);border:1px solid #9c8be075;border-radius:8px;background:#080a1eab;padding:7px 14px;color:#f4d7ff;font-size:13px;display:none"></div><div id="grappleStatus" style="position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);pointer-events:none;display:none;color:#bdeaff;background:#061421b5;border:1px solid #6ad7ff99;padding:6px 12px;border-radius:6px;font:700 12px Arial;letter-spacing:1px;text-align:center;white-space:nowrap"></div><div id="damage-flash"></div><div id="veil"><div id="panel"><h1>NULLSCAPE</h1><p>Patch 5 study build — v5.0 Optimized<br/>Collect every gift on four floating routes to open the Beacon. During collapse, collect gold gifts and reach the Beacon before the platforms disappear.</p><p class="small">Fan-made browser reconstruction. Game mechanics researched from public wiki references; original models and exact balance are not available. Unofficial reconstruction; class abilities, enemy AI, map generation and visual assets are approximations.</p><div class="class-picker"><label>CLASS <select id="classSelect"><option value="diver">DIVER — forward burst, one dive per airtime</option><option value="charger">CHARGER — hold to charge (meter drains)</option><option value="grappler">GRAPPLER — 34m hook · land to detach · E to swing</option><option value="spirit">SPIRIT — leave your body</option><option value="glider">GLIDER — hold E, dive to accelerate, pull up to climb</option><option value="wanted">WANTED — stop momentum</option><option value="prisoner">PRISONER — no ability</option></select></label><label>MODE <select id="difficulty"><option value="standard">STANDARD</option><option value="casual">CASUAL</option><option value="extreme">EXTREME</option></select></label></div><button id="start">ENTER THE VOID</button></div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
+const $=x=>document.getElementById(x), V=THREE.Vector3;
+const scene=new THREE.Scene();scene.background=new THREE.Color('#040613');scene.fog=new THREE.FogExp2(0x09081a,.0062);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.25));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.24;document.body.insertBefore(renderer.domElement,document.body.firstChild);
+const camera=new THREE.PerspectiveCamera(67,innerWidth/innerHeight,.08,700);camera.position.set(0,14,24);scene.add(new THREE.HemisphereLight(0x7d88d8,0x07030c,1.65));const moon=new THREE.DirectionalLight(0xa6adff,1.9);moon.position.set(-20,35,22);scene.add(moon);const purple=new THREE.PointLight(0x8b51ff,60,105);purple.position.set(0,9,0);scene.add(purple);const teal=new THREE.PointLight(0x6bf0df,28,150);teal.position.set(32,11,-26);scene.add(teal);
+// Distant abstract forms and stars, non-collidable environment only.
+const starsGeo=new THREE.BufferGeometry(),stars=[];for(let i=0;i<420;i++){let r=120+Math.random()*270,a=Math.random()*Math.PI*2,y=(Math.random()-.4)*210;stars.push(Math.cos(a)*r,y,Math.sin(a)*r)}starsGeo.setAttribute('position',new THREE.Float32BufferAttribute(stars,3));scene.add(new THREE.Points(starsGeo,new THREE.PointsMaterial({color:0x7e83ca,size:.65,transparent:true,opacity:.78,sizeAttenuation:true})));
+const deco=new THREE.Group();scene.add(deco);const Dmaterial=new THREE.MeshBasicMaterial({color:0x6033ae,wireframe:true,transparent:true,opacity:.24});for(let i=0;i<12;i++){let q=new THREE.Mesh(new THREE.IcosahedronGeometry(2+Math.random()*8,0),Dmaterial);let a=Math.random()*Math.PI*2,r=85+Math.random()*110;q.position.set(Math.cos(a)*r, (Math.random()-.5)*75,Math.sin(a)*r);q.rotation.set(Math.random()*5,Math.random()*6,Math.random()*6);deco.add(q)}
+const floorY=0, tileSize=8, tileThick=4.8;const world=new THREE.Group();scene.add(world);let tiles=[],presents=[],colliders=[],total=0,got=0,gold=0,level=1,phase='collect',collapseTime=0,levelSeed=1,dead=false,transition=false;
+const solids=new THREE.MeshStandardMaterial({color:0x090a12,roughness:.73,metalness:.28});const edgeMat=new THREE.MeshStandardMaterial({color:0x6a5f88,emissive:0x3a275a,emissiveIntensity:.62,roughness:.48});const dark=new THREE.MeshStandardMaterial({color:0x05050a,roughness:.78,metalness:.12});const light=new THREE.MeshStandardMaterial({color:0xc8c7d2,roughness:.78,emissive:0x1c1633,emissiveIntensity:.16});const trim=new THREE.MeshStandardMaterial({color:0xf4e4ff,emissive:0x996bff,emissiveIntensity:.82});
+// A more contrast-heavy sky pushes the browser build closer to Patch 5's dark void / bloom atmosphere.
+const skyUniforms={uTime:{value:0}};
+const sky=new THREE.Mesh(new THREE.SphereGeometry(420,24,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,uniforms:skyUniforms,vertexShader:`varying vec3 vP; void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec3 vP;void main(){vec3 d=normalize(vP);float horizon=1.0-smoothstep(-0.20,0.68,d.y);float upper=smoothstep(-0.1,0.85,d.y);vec3 color=mix(vec3(.004,.019,.030),vec3(.006,.059,.066),horizon*.72);color=mix(color,vec3(.009,.012,.039),upper*.68);float haze=pow(max(0.0,1.0-abs(d.y)),5.0);color+=vec3(.008,.023,.026)*haze;gl_FragColor=vec4(color,1.0);}`}));scene.add(sky);
+const farObjects=new THREE.Group();scene.add(farObjects);const outlined=new THREE.MeshBasicMaterial({color:0x9c80ff,wireframe:true,transparent:true,opacity:.42,depthWrite:false});const silhouette=new THREE.MeshStandardMaterial({color:0x100f32,emissive:0x130c3d,metalness:.35,roughness:.58,flatShading:true});for(let i=0;i<10;i++){let a=Math.random()*Math.PI*2,rad=115+Math.random()*180;const shape=new THREE.Mesh(i%3===0?new THREE.OctahedronGeometry(8+Math.random()*15,0):new THREE.IcosahedronGeometry(7+Math.random()*17,0),i%3===0?outlined:silhouette);shape.position.set(Math.sin(a)*rad,(Math.random()-.5)*110,Math.cos(a)*rad);shape.rotation.set(Math.random()*3,Math.random()*3,Math.random()*3);farObjects.add(shape)}
+const beamGroup=new THREE.Group();scene.add(beamGroup);const beamMaterial=new THREE.MeshBasicMaterial({color:0xe9bd72,transparent:true,opacity:.15,depthWrite:false,side:THREE.DoubleSide});for(let j=0;j<3;j++){let c=new THREE.Mesh(new THREE.ConeGeometry(4+j*1.3,130,3,1,true),beamMaterial);c.position.set(145,-10,-120);c.rotation.z=Math.PI;beamGroup.add(c)}
+const sharedBoxGeometries=new Map();
+function sharedBoxGeometry(w,h,d){
+ const key=w.toFixed(4)+','+h.toFixed(4)+','+d.toFixed(4);
+ let geometry=sharedBoxGeometries.get(key);
+ if(!geometry){geometry=new THREE.BoxGeometry(w,h,d);geometry.userData.persistent=true;sharedBoxGeometries.set(key,geometry)}
+ return geometry;
+}
+function box(parent,w,h,d,mat,x,y,z){let o=new THREE.Mesh(sharedBoxGeometry(w,h,d),mat);o.position.set(x,y,z);parent.add(o);return o}
+// v5.0: One checkerboard surface per tile instead of 36 independent meshes.
+const checkerCanvas=document.createElement('canvas');checkerCanvas.width=checkerCanvas.height=384;
+const checkerCtx=checkerCanvas.getContext('2d');
+for(let z=0;z<6;z++)for(let x=0;x<6;x++){
+ checkerCtx.fillStyle=(x+z)%2?'#08070e':'#c8c6d1';
+ checkerCtx.fillRect(x*64,z*64,64,64);
+}
+const checkerTexture=new THREE.CanvasTexture(checkerCanvas);
+checkerTexture.colorSpace=THREE.SRGBColorSpace;checkerTexture.magFilter=THREE.NearestFilter;checkerTexture.minFilter=THREE.LinearMipmapLinearFilter;
+checkerTexture.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
+const checkerMaterial=new THREE.MeshStandardMaterial({map:checkerTexture,roughness:.78,metalness:.08,side:THREE.DoubleSide});
+const checkerGeometry=new THREE.PlaneGeometry(tileSize,tileSize);checkerGeometry.userData.persistent=true;
+const undersideMaterial=new THREE.MeshStandardMaterial({color:0x0e0c18,emissive:0x140a24,emissiveIntensity:.22,roughness:.8});
+const hubMarkerMaterial=new THREE.MeshBasicMaterial({color:0x7d63c9,transparent:true,opacity:.75});
+const hero=new THREE.Group();scene.add(hero);const bodyMat=new THREE.MeshStandardMaterial({color:0x181428,roughness:.7}),hoodMat=new THREE.MeshStandardMaterial({color:0x543e87,roughness:.72}),skinMat=new THREE.MeshStandardMaterial({color:0xf5d8bc,roughness:.75}),sneakerMat=new THREE.MeshStandardMaterial({color:0x10111e,roughness:.7});
+const torso=box(hero,1.05,1.23,.65,bodyMat,0,1.66,0);const head=box(hero,.73,.82,.68,skinMat,0,2.72,0);box(hero,.82,.24,.76,hoodMat,0,3.09,.02);box(hero,.75,.12,.16,sneakerMat,0,2.76,-.34);const limbs=[];for(const x of [-.34,.34]){let leg=new THREE.Group();leg.position.set(x,1.05,0);hero.add(leg);box(leg,.33,.85,.42,bodyMat,0,-.43,0);box(leg,.42,.22,.65,sneakerMat,0,-.92,-.11);limbs.push(leg)}for(const x of [-.68,.68]){let arm=new THREE.Group();arm.position.set(x,2.15,0);hero.add(arm);box(arm,.31,1,.42,hoodMat,0,-.5,0);box(arm,.31,.19,.4,skinMat,0,-1.01,0);limbs.push(arm)}let stride=0;
+// Glider wings deploy only during active flight; independent fan-made geometry.
+const glideWings=new THREE.Group();hero.add(glideWings);glideWings.visible=false;
+const wingSkin=new THREE.MeshStandardMaterial({color:0x73c6de,emissive:0x194e87,emissiveIntensity:.32,side:THREE.DoubleSide,roughness:.42,transparent:true,opacity:.88});
+for(const side of [-1,1]){
+ const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute([side*.34,2.32,.05,side*2.65,2.06,.34,side*1.18,1.79,.95,side*.34,2.32,.05,side*1.18,1.79,.95,side*.57,1.65,.54],3));
+ geom.computeVertexNormals();glideWings.add(new THREE.Mesh(geom,wingSkin));
+}
+// Beacon: pure luminous escape beam, visible only after collapse begins.
+const beacon=new THREE.Group();world.add(beacon);
+const ringMat=new THREE.MeshStandardMaterial({color:0xffdf8c,metalness:0,roughness:1,transparent:true,opacity:0});
+const goldFrame=new THREE.MeshBasicMaterial({color:0xffd677,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide});
+const goldHalo=new THREE.MeshBasicMaterial({color:0xffe9b5,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide});
+const beaconCore=new THREE.Group();beacon.add(beaconCore);
+// Pure light-column Beacon: appears only during collapse and fills the whole vertical escape path.
+const ring=new THREE.Mesh(new THREE.TorusGeometry(1.1,.03,8,40),goldHalo);ring.rotation.x=Math.PI/2;ring.position.y=2.2;beacon.add(ring);
+const ring2=new THREE.Mesh(new THREE.TorusGeometry(1.0,.028,8,40),goldHalo);ring2.rotation.x=Math.PI/2;ring2.position.y=5.5;beacon.add(ring2);
+const ring3=new THREE.Mesh(new THREE.TorusGeometry(.9,.025,8,40),goldHalo);ring3.rotation.x=Math.PI/2;ring3.position.y=9.2;beacon.add(ring3);
+const beaconSpikes=[];
+const portalMat=new THREE.MeshBasicMaterial({color:0xffe7ad,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide});
+const portal=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.25,16,28,1,true),portalMat);portal.position.y=8;beacon.add(portal);
+const portalInner=new THREE.Mesh(new THREE.CylinderGeometry(.62,.62,16.4,24,1,true),new THREE.MeshBasicMaterial({color:0xfffffd,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));portalInner.position.y=8;beacon.add(portalInner);
+const beaconBeam=new THREE.Mesh(new THREE.CylinderGeometry(1.7,2.15,90,32,1,true),new THREE.MeshBasicMaterial({color:0xffefc1,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));beaconBeam.position.y=45;beacon.add(beaconBeam);
+const beamCore=new THREE.Mesh(new THREE.CylinderGeometry(.72,.72,92,24,1,true),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));beamCore.position.y=45;beacon.add(beamCore);
+const beaconGlow=new THREE.PointLight(0xffe39a,0,145);beaconGlow.position.y=10;beacon.add(beaconGlow);
+const beaconRays=[];
+for(let i=0;i<6;i++){
+ const halo=new THREE.Mesh(new THREE.RingGeometry(.9+i*.15,1.02+i*.15,40),new THREE.MeshBasicMaterial({color:i%2?0xfff0c0:0xffd36f,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));
+ halo.rotation.x=-Math.PI/2;halo.position.y=2.5+i*1.6;beacon.add(halo);beaconRays.push(halo);
+}
+const beaconCrown=new THREE.Mesh(new THREE.SphereGeometry(.4,16,16),new THREE.MeshBasicMaterial({color:0xfffffb,transparent:true,opacity:0,depthWrite:false}));beaconCrown.position.y=12.6;beacon.add(beaconCrown);
+const rnd=(function(){let n=12345;return {seed(s){n=s|0},next(){n^=n<<13;n^=n>>>17;n^=n<<5;return(n>>>0)/4294967296}}})();
+// Collapse study: glowing fracture veins on the top and full-depth sides.
+// Generated textures, not the original Roblox assets.
+function fractureTexture(seed){
+  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;
+  const c=canvas.getContext('2d'),W=512,N=14;
+  let state=(seed*1664525+1013904223)>>>0;
+  const rand=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296};
+  // A jittered mosaic whose irregular boundaries resemble lightning cracks.
+  const pts=[];
+  for(let y=-1;y<=N;y++)for(let x=-1;x<=N;x++)
+    pts.push([(x+.5+(rand()-.5)*.78)*W/N,(y+.5+(rand()-.5)*.78)*W/N]);
+  const k=128, labels=new Uint16Array(k*k);
+  for(let y=0;y<k;y++)for(let x=0;x<k;x++){
+    const px=(x+.5)*W/k,py=(y+.5)*W/k;let best=Infinity,bi=0;
+    for(let i=0;i<pts.length;i++){
+      const dx=px-pts[i][0],dy=py-pts[i][1],d=dx*dx+dy*dy;
+      if(d<best){best=d;bi=i}
+    }
+    labels[y*k+x]=bi;
+  }
+  // Rasterize fracture boundaries then add a tight bright core and subtle halo.
+  const layer=document.createElement('canvas');layer.width=k;layer.height=k;
+  const lc=layer.getContext('2d'),img=lc.createImageData(k,k);
+  for(let y=0;y<k;y++)for(let x=0;x<k;x++){
+    const i=y*k+x,a=labels[i];
+    const edge=(x<k-1&&labels[i+1]!==a)||(y<k-1&&labels[i+k]!==a);
+    if(edge){const v=i*4;img.data[v]=235;img.data[v+1]=207;img.data[v+2]=255;img.data[v+3]=255}
+  }
+  lc.putImageData(img,0,0);
+  c.imageSmoothingEnabled=true;c.shadowColor='#b761ff';c.shadowBlur=14;c.globalAlpha=.62;
+  c.drawImage(layer,0,0,W,W);
+  c.shadowBlur=5;c.globalAlpha=1;c.drawImage(layer,0,0,W,W);
+  // Intermittent cool cyan or hot magenta pulses along the fracture network.
+  for(let j=0;j<23;j++){
+    let x=rand()*W,y=rand()*W;c.beginPath();c.moveTo(x,y);
+    for(let q=0;q<4;q++){x+=(rand()-.5)*32;y+=(rand()-.5)*32;c.lineTo(x,y)}
+    c.strokeStyle=j%3?'rgba(252,126,255,.64)':'rgba(126,253,255,.65)';
+    c.lineWidth=2+rand()*2;c.shadowColor=c.strokeStyle;c.shadowBlur=7;c.stroke();
+  }
+  const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
+  tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+  tex.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
+  return tex;
+}
+const fractureTextures=[fractureTexture(19),fractureTexture(87),fractureTexture(231),fractureTexture(481)];
+const crackShellGeometry=new THREE.BoxGeometry(tileSize+.055,tileThick+.12,tileSize+.055);crackShellGeometry.userData.persistent=true;
+function attachFractures(t){
+  if(t.hub||t.crack)return;
+  const mat=new THREE.MeshBasicMaterial({map:fractureTextures[Math.abs(t.x*3+t.z*7)%fractureTextures.length],transparent:true,opacity:0,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+  // A six-sided shell lets fractures wrap across upper surface and side walls.
+  const shell=new THREE.Mesh(crackShellGeometry,mat);
+  shell.position.y=-tileThick/2+.015;shell.renderOrder=5;
+  shell.visible=false;t.group.add(shell);t.crack=shell;
+  t.crackMat=mat;
+}
+function updateFractures(t,remaining,dt){
+  if(!t.crack)attachFractures(t);
+  const progress=THREE.MathUtils.clamp(1-remaining/3.35,0,1);
+  t.crack.visible=progress>0;
+  // Fractures appear early, spread and pulse brighter just before destruction.
+  t.crackMat.opacity=Math.min(.99,.17+progress*.82)*(1+.07*Math.sin(collapseTime*13+t.index));
+  if(progress>.77){t.group.position.y=t.y-.065*Math.sin(collapseTime*17+t.index);}
+}
+const collapseShardGeometry=new THREE.TetrahedronGeometry(.23);collapseShardGeometry.userData.persistent=true;const collapseShardMaterial=new THREE.MeshBasicMaterial({color:0xd89bff,transparent:true,opacity:.9,depthWrite:false});
+function collapseFragments(t){
+  // Small emissive shards fall briefly where the platform breaks.
+  // Capped so higher levels do not create an unbounded particle load.
+  if(collapseShards.length>130)return;
+  const material=collapseShardMaterial;
+  for(let i=0;i<5;i++){
+    const shard=new THREE.Mesh(collapseShardGeometry,material.clone());
+    shard.position.set(t.x*tileSize+(Math.random()-.5)*tileSize,t.y-.1,t.z*tileSize+(Math.random()-.5)*tileSize);
+    shard.scale.setScalar(.48+Math.random());scene.add(shard);
+    collapseShards.push({mesh:shard,v:new V((Math.random()-.5)*4,Math.random()*3,(Math.random()-.5)*4),life:.8+Math.random()*.65});
+  }
+}
+let collapseShards=[];
+function animateCollapseShards(dt){
+  for(let i=collapseShards.length-1;i>=0;i--){
+    const q=collapseShards[i];q.life-=dt;q.v.y-=dt*19;
+    q.mesh.position.addScaledVector(q.v,dt);q.mesh.rotation.x+=dt*4;q.mesh.rotation.z+=dt*6;
+    q.mesh.material.opacity=Math.min(.8,Math.max(0,q.life));
+    if(q.life<=0){scene.remove(q.mesh);q.mesh.material.dispose();collapseShards.splice(i,1)}
+  }
+}
+function clearCollapseShards(){for(const q of collapseShards){scene.remove(q.mesh);q.mesh.material.dispose()}collapseShards=[]}
+
+const key=(x,z)=>x+','+z;let used=new Set();function createTile(x,z,routeIndex=0,hub=false,elevation=0){let k=key(x,z);if(used.has(k))return null;used.add(k);let g=new THREE.Group();g.position.set(x*tileSize,elevation,z*tileSize);world.add(g);box(g,tileSize,tileThick,tileSize,solids,0,-tileThick/2,0);const checker=new THREE.Mesh(checkerGeometry,checkerMaterial);checker.rotation.x=-Math.PI/2;checker.position.y=.055;g.add(checker);box(g,tileSize+.12,.14,.2,edgeMat,0,-.12,-tileSize/2);box(g,tileSize+.12,.14,.2,edgeMat,0,-.12,tileSize/2);box(g,.2,.14,tileSize+.12,edgeMat,-tileSize/2,-.12,0);box(g,.2,.14,tileSize+.12,edgeMat,tileSize/2,-.12,0);for(const sx of [-1,1])for(const sz of [-1,1]){const pylon=new THREE.Mesh(sharedBoxGeometry(.18,.6,.18),edgeMat);pylon.position.set((tileSize/2-.45)*sx,-.42,(tileSize/2-.45)*sz);g.add(pylon)}const underside=new THREE.Mesh(sharedBoxGeometry(tileSize*.82,.18,tileSize*.82),undersideMaterial);underside.position.set(0,-tileThick-.11,0);g.add(underside);if(!hub&&rnd.next()<.34){const fragment=new THREE.Mesh(new THREE.TetrahedronGeometry(.5+rnd.next()*.8,0),trim);fragment.position.set((rnd.next()-.5)*5,1.35,(rnd.next()-.5)*5);fragment.rotation.set(.4,.4,0);g.add(fragment)}if(hub){for(let a=0;a<4;a++){const mark=new THREE.Mesh(sharedBoxGeometry(1.1,.06,2.1),hubMarkerMaterial);mark.position.set(Math.sin(a*Math.PI/2)*2.25,.07,Math.cos(a*Math.PI/2)*2.25);mark.rotation.y=a*Math.PI/2;g.add(mark)}}let t={x,z,y:elevation,group:g,active:true,hub,age:0,index:tiles.length,depth:Math.max(Math.abs(x),Math.abs(z)),collapseAt:Infinity,routeStep:Math.max(Math.abs(x),Math.abs(z))};tiles.push(t);return t}
+// Solid elevated structures for Glider bonks. Each is parented to its tile, so
+// destruction removes its geometry and its collider together.
+let routeObstacles=[];
+const obstacleWallMat=new THREE.MeshStandardMaterial({color:0x28203b,roughness:.76,metalness:.12,emissive:0x140d25,emissiveIntensity:.22});
+const obstacleCapMat=new THREE.MeshStandardMaterial({color:0xd3c6ee,emissive:0x584c95,emissiveIntensity:.35,roughness:.67});
+function addRouteObstacle(t,x,z,w,h,d,kind){
+  // Relative X/Z; collider is a separate axis-aligned world-space box.
+  const g=new THREE.Group();g.position.set(x,0,z);t.group.add(g);
+  const body=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),obstacleWallMat);
+  body.position.y=h/2;g.add(body);
+  const rim=new THREE.Mesh(new THREE.BoxGeometry(w+.09,.13,d+.09),obstacleCapMat);
+  rim.position.y=h+.055;g.add(rim);
+  if(kind==='pillar'){
+    for(let y=1;y<h-1;y+=2){let stripe=new THREE.Mesh(new THREE.BoxGeometry(w+.025,.09,d+.025),edgeMat);stripe.position.y=y;g.add(stripe)}
+  }
+  routeObstacles.push({tile:t,x:t.x*tileSize+x,z:t.z*tileSize+z,halfX:w/2,halfZ:d/2,bottom:t.y,top:t.y+h,kind,mesh:g});
+}
+function spawnRouteObstacles(){
+  routeObstacles=[];
+  // Only standalone pillars; the thickened track sides provide bonk surfaces.
+  // Keep the gift centerline and navigation clear.
+  for(const t of tiles){
+    if(t.hub)continue;
+    const step=t.routeStep;
+    if(step%4===2){
+      addRouteObstacle(t,-2.9,2.85,1.65,5.2+(level>=8?1.8:0),1.65,'pillar');
+    }
+    if(step%5===0){
+      addRouteObstacle(t,2.8,-2.8,1.5,7.0+(level>=8?3:0),1.5,'pillar');
+    }
+  }
+}
+const giftMaterials={
+ regular:{base:new THREE.MeshStandardMaterial({color:0x050505,emissive:0x4a1b73,emissiveIntensity:.24,metalness:.22,roughness:.26}),ribbon:new THREE.MeshStandardMaterial({color:0x141014,emissive:0x7a39bb,emissiveIntensity:.22}),aura:new THREE.MeshBasicMaterial({color:0xc14dff,transparent:true,opacity:.34,side:THREE.DoubleSide,depthWrite:false})},
+ golden:{base:new THREE.MeshStandardMaterial({color:0xffd052,emissive:0xaa7300,emissiveIntensity:.72,metalness:.22,roughness:.26}),ribbon:new THREE.MeshStandardMaterial({color:0xfff7c1,emissive:0xffd057,emissiveIntensity:.66}),aura:new THREE.MeshBasicMaterial({color:0xffde79,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false})}
+};
+const giftBowGeometry=new THREE.TorusGeometry(.34,.1,8,20);giftBowGeometry.userData.persistent=true;
+const giftAuraGeometry=new THREE.RingGeometry(.9,1.18,28);giftAuraGeometry.userData.persistent=true;
+// v5.0: merge static gift meshes once, retaining the original geometry and dimensions.
+function mergeStaticMeshParts(parts){
+ const positions=[],normals=[],uvs=[];
+ for(const [geometry,x,y,z,rx,ry,rz] of parts){
+  const copy=geometry.clone();copy.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx,ry,rz)),new THREE.Vector3(1,1,1)));
+  const flat=copy.index?copy.toNonIndexed():copy;
+  positions.push(...flat.getAttribute('position').array);
+  normals.push(...flat.getAttribute('normal').array);
+  uvs.push(...flat.getAttribute('uv').array);
+  if(flat!==copy)flat.dispose();copy.dispose();
+ }
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.computeBoundingSphere();g.userData.persistent=true;return g;
+}
+const giftBaseGeometry=mergeStaticMeshParts([
+ [sharedBoxGeometry(1.38,1.14,1.38),0,.88,0,0,0,0],
+ [sharedBoxGeometry(1.56,.26,1.56),0,1.56,0,0,0,0]
+]);
+const giftRibbonGeometry=mergeStaticMeshParts([
+ [sharedBoxGeometry(1.58,.2,.2),0,.92,0,0,0,0],
+ [sharedBoxGeometry(.2,.2,1.58),0,.92,0,0,0,0],
+ [sharedBoxGeometry(.22,.18,1.64),0,1.64,0,0,0,0],
+ [sharedBoxGeometry(1.64,.18,.22),0,1.64,0,0,0,0],
+ [giftBowGeometry,-.25,1.88,0,0,Math.PI/2,0],
+ [giftBowGeometry,.25,1.88,0,0,Math.PI/2,0]
+]);
+function makeGift(tile,golden=false){let gp=new THREE.Group();gp.position.set(tile.x*tileSize,tile.y+1.05,tile.z*tileSize);if(!golden&&chosenCurses.includes('scattered')){gp.position.x+=(rnd.next()-.5)*2.0;gp.position.z+=(rnd.next()-.5)*2.0}world.add(gp);const materials=golden?giftMaterials.golden:giftMaterials.regular;
+ gp.add(new THREE.Mesh(giftBaseGeometry,materials.base));gp.add(new THREE.Mesh(giftRibbonGeometry,materials.ribbon));
+ const aura=new THREE.Mesh(giftAuraGeometry,materials.aura);aura.rotation.x=-Math.PI/2;aura.position.y=.18;gp.add(aura);
+ presents.push({group:gp,tile,golden,baseY:gp.position.y,phase:rnd.next()*6.28,found:false});}
+// Wiki-grounded level events and interactive altars. Exact balance values are independent approximations.
+let altars=[], lastAltar=null,chaosShopPending=false, altarBonus=0, iceLevel=false,highriseLevel=false;
+const altarDefinitions=[
+{id:'chance',name:'Altar of Chance',color:0xf7e388},
+{id:'chaos',name:'Altar of Chaos',color:0xfa639e},
+{id:'echo',name:'Altar of Echo',color:0x8beafa},
+{id:'passage',name:'Altar of Passage',color:0xf0bc51},
+{id:'protection',name:'Altar of Protection',color:0x93f8d9},
+{id:'purgatory',name:'Altar of Purgatory',color:0xee737a},
+{id:'purification',name:'Altar of Purification',color:0xd8b8ff}
+];
+function altarModel(def,tile){const g=new THREE.Group();g.position.set(tile.x*tileSize+2.0,tile.y,tile.z*tileSize+2.0);world.add(g);
+const mat=new THREE.MeshStandardMaterial({color:def.color,emissive:def.color,emissiveIntensity:.55,metalness:.4,roughness:.32});
+box(g,2,.65,2,solids,0,.35,0);box(g,1.65,.2,1.65,mat,0,.74,0);
+for(let x of [-.72,.72])for(let z of [-.72,.72])box(g,.2,1.75,.2,mat,x,1.35,z);
+const orb=new THREE.Mesh(def.id==='chance'?new THREE.DodecahedronGeometry(.67):new THREE.OctahedronGeometry(.74),mat);orb.position.y=2.45;g.add(orb);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.04,.065,6,30),mat);halo.rotation.x=Math.PI/2;halo.position.y=2.25;g.add(halo);
+const obj={def,tile,group:g,orb,halo,used:false};altars.push(obj);return obj}
+function spawnAltarSet(){altars=[];iceLevel=level>=(difficulty==='extreme'?5:8);highriseLevel=level>=18;
+let count=(level<3?0:level<12?1:level<16?2:level<20?3:4)+(owned.includes('morealtars')?1:0);
+const possible=tiles.filter(t=>!t.hub&&t.routeStep>=3&&t.routeStep<8);
+for(let i=0;i<count&&possible.length;i++){const k=Math.floor(rnd.next()*possible.length),t=possible.splice(k,1)[0];const def=altarDefinitions[Math.floor(rnd.next()*altarDefinitions.length)];altarModel(def,t)}
+if(iceLevel){const iceMat=new THREE.MeshStandardMaterial({color:0x9ad9f0,emissive:0x398ba5,emissiveIntensity:.35,transparent:true,opacity:.72,roughness:.12});for(const t of tiles)if(!t.hub&&!t.isRamp&&rnd.next()<.12){t.icy=true;const ice=new THREE.Mesh(new THREE.BoxGeometry(tileSize-.3,.055,tileSize-.3),iceMat);ice.position.y=.1;t.group.add(ice)}}
+if(highriseLevel){for(const t of tiles)if(!t.hub&&!t.isRamp&&rnd.next()<.10){const height=9+Math.floor(rnd.next()*11);let tower=new THREE.Mesh(new THREE.BoxGeometry(1.7,height,1.7),edgeMat);tower.position.set(tileSize*.31,height/2,tileSize*.31);t.group.add(tower);t.tower=true;}}
+}
+function applyAltar(a,isEcho=false){if(!a||a.used)return;a.used=true;a.orb.material=new THREE.MeshStandardMaterial({color:0x34323a,roughness:.9});a.halo.visible=false;
+const id=a.def.id;if(!isEcho&&id!=='echo')lastAltar=id;
+if(id==='chance'){if(Math.random()<.55){gold+=7+level*2;toast('CHANCE: BONUS GOLDEN GIFTS')}else{dashCharge=.05;toast('CHANCE: ABILITY DRAIN')}}
+else if(id==='chaos'){chaosShopPending=true;toast('CHAOS SHOP WILL APPEAR AT INTERMISSION')}
+else if(id==='echo'){if(lastAltar){const fake={def:{id:lastAltar},used:false,orb:{material:null},halo:{visible:false}};applyAltar(fake,true)}else{gold+=4;toast('ECHO: NO PREVIOUS ALTAR')}}
+else if(id==='passage'){const targets=tiles.filter(t=>!t.hub&&t.active&&!t.icy).slice(-4);for(const t of targets)makeGift(t,true);toast('PASSAGE: TEMPORARY GOLDEN GIFTS')}
+else if(id==='protection'){shield+=1;toast('PROTECTION: SHIELD GRANTED')}
+else if(id==='purgatory'){gold+=12+level*3;const ids=['mart','baby','husk'];chosenEnemies.push(ids[Math.floor(Math.random()*ids.length)]);rebuildMobs();toast('PURGATORY: GOLD FOR AN ADDED ENEMY')}
+else if(id==='purification'){if(chosenCurses.length){const removed=chosenCurses.pop();toast('CURSE REMOVED: '+removed.toUpperCase());if(!chosenEnemies.includes('mart'))chosenEnemies.push('mart');rebuildMobs()}else toast('NO CURSE TO PURIFY')}
+updateHud()}
+function interactAltar(){if(!started||paused||dead)return;const a=altars.find(a=>!a.used&&Math.hypot(a.group.position.x-p.x,a.group.position.z-p.z)<4.8);if(a)applyAltar(a)}
+function updateAltars(dt){let closest=null,best=Infinity;for(const a of altars){if(a.used)continue;const d=Math.hypot(a.group.position.x-p.x,a.group.position.z-p.z);a.orb.rotation.y+=dt*1.1;a.halo.rotation.z+=dt*.25;if(d<best){closest=a;best=d}}
+const tip=$('interaction');if(started&&!paused&&closest&&best<4.8){tip.style.display='block';tip.textContent='[F] '+closest.def.name.toUpperCase()}else tip.style.display='none'}
+// Challenge tiles: jump pads and telegraphed tripmines are independently reconstructed mechanics.
+let jumpPads=[],tripmines=[],jumpPadCooldown=0,tripmineGrace=0,runDistance=0,runGoldCollected=0,roundGoldCollected=0,guideVisible=false;
+const jumpMat=new THREE.MeshStandardMaterial({color:0x298cf9,emissive:0x145de7,emissiveIntensity:1.3,metalness:.3,roughness:.22});
+const trapMat=new THREE.MeshStandardMaterial({color:0xff5373,emissive:0xd31c45,emissiveIntensity:.9,roughness:.3});
+function spawnChallengeTiles(){jumpPads=[];tripmines=[];jumpPadCooldown=0;tripmineGrace=1.5;
+const pads=tiles.filter(t=>!t.hub&&t.routeStep>=2&&t.routeStep%4===2);
+if(level>=2)for(const t of pads){const mesh=new THREE.Group();const radial=new V(t.x,0,t.z).normalize();const side=new V(-radial.z,0,radial.x);const sideSign=(t.index%2)?1:-1;mesh.position.set(t.x*tileSize+side.x*sideSign*5.1,t.y+2.45,t.z*tileSize+side.z*sideSign*5.1);world.add(mesh);
+const base=new THREE.Mesh(new THREE.BoxGeometry(3.2,.42,3.2),jumpMat);mesh.add(base);const top=new THREE.Mesh(new THREE.BoxGeometry(2.45,.035,2.45),new THREE.MeshBasicMaterial({color:0x9edbff}));top.position.y=.23;mesh.add(top);for(const x of [-1,1])for(const z of [-1,1]){const corner=new THREE.Mesh(new THREE.BoxGeometry(.38,.09,.38),new THREE.MeshBasicMaterial({color:0x0c40d5}));corner.position.set(x*1.22,.27,z*1.22);mesh.add(corner)}const circle=new THREE.Mesh(new THREE.RingGeometry(.76,.97,32),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.7,side:THREE.DoubleSide,depthWrite:false}));circle.rotation.x=-Math.PI/2;circle.position.y=.252;mesh.add(circle);jumpPads.push({mesh,tile:t,circle,topY:mesh.position.y+.24,uses:0});}
+if(level>=(difficulty==='extreme'?2:difficulty==='standard'?5:9999)){const possible=tiles.filter(t=>!t.hub&&t.routeStep>3&&t.routeStep%3===0);const n=Math.min(2+Math.floor(level/4),8);for(let i=0;i<n&&possible.length;i++){const idx=Math.floor(rnd.next()*possible.length),t=possible.splice(idx,1)[0];
+// A tripmine occupies the collectible slot: remove the regular gift and adjust the objective.
+for(let gi=presents.length-1;gi>=0;gi--){const gift=presents[gi];if(gift.tile===t&&!gift.golden){world.remove(gift.group);presents.splice(gi,1);total=Math.max(0,total-1)}}
+// Tripmine replaces a gift exactly in its slot: a gift-sized neon pink/purple cube.
+const gr=new THREE.Group();gr.position.set(t.x*tileSize,t.y+1.05,t.z*tileSize);world.add(gr);
+const mineSide=1.58,mineCenterY=.96;
+const core=new THREE.Mesh(new THREE.BoxGeometry(mineSide,mineSide,mineSide),new THREE.MeshStandardMaterial({color:0x9d13d8,emissive:0xe62cff,emissiveIntensity:1.8,metalness:0,roughness:.24}));core.position.y=mineCenterY;gr.add(core);
+// Edge glow outlines the square without enlarging its actual collision volume.
+const core2=new THREE.LineSegments(new THREE.EdgesGeometry(core.geometry),new THREE.LineBasicMaterial({color:0xff9afa,transparent:true,opacity:.93,depthWrite:false}));core2.position.copy(core.position);gr.add(core2);
+tripmines.push({tile:t,mesh:gr,core,core2,armed:true,warning:0,halfWidth:mineSide/2,bottom:gr.position.y+mineCenterY-mineSide/2,top:gr.position.y+mineCenterY+mineSide/2});}}
+}
+// A pad is a non-solid trigger: contact with its blue square launches the player.
+// Glider bonks use exactly the same base upward velocity as a jump pad.
+const VERTICAL_LAUNCH_SPEED=28;
+const padPreviousPosition=new V();
+function touchesJumpPad(j){
+  // Sample movement across the entire frame to avoid skipping thin floating pads.
+  // The full-height player capsule triggers the square; the pad never pushes back.
+  for(let n=0;n<=6;n++){
+    const a=n/6;
+    const x=padPreviousPosition.x+(p.x-padPreviousPosition.x)*a;
+    const y=padPreviousPosition.y+(p.y-padPreviousPosition.y)*a;
+    const z=padPreviousPosition.z+(p.z-padPreviousPosition.z)*a;
+    if(y>j.topY+.30||y+BODY_HEIGHT<j.topY-.44)continue;
+    if(circleHitsRect(x,z,BODY_RADIUS,j.mesh.position.x,j.mesh.position.z,1.6,1.6))return true;
+  }
+  return false;
+}
+function updateChallengeTiles(dt){jumpPadCooldown=Math.max(0,jumpPadCooldown-dt);tripmineGrace=Math.max(0,tripmineGrace-dt);
+for(const j of jumpPads){if(!j.tile.active){j.mesh.visible=false;continue}j.circle.rotation.z+=dt*1.4;if(jumpPadCooldown<=0&&touchesJumpPad(j)){vel.y=VERTICAL_LAUNCH_SPEED*(chosenCurses.includes('weakerpads')?.65:1);grounded=false;jumpPadCooldown=.8;jumpsUsed=0;gliding=false;glideWings.visible=false;if(activeClass==='grappler'&&hookActive)stopHook();if(activeClass==='grappler')dashCharge=Math.min(1,dashCharge+.15);if(activeClass==='glider')dashCharge=Math.min(1,dashCharge+.3);toast('JUMP PAD — LAUNCH!');}}
+for(const mine of tripmines){if(!mine.tile.active||!mine.armed){mine.mesh.visible=false;continue}mine.core.material.emissiveIntensity=1.5+.3*Math.sin(performance.now()*.005);const mineHalfWidth=mine.halfWidth;const mineBottom=mine.bottom;const mineTop=mine.top;const overlapsMineHeight=p.y<mineTop&&p.y+BODY_HEIGHT>mineBottom;const overlapsMineSquare=circleHitsRect(p.x,p.z,BODY_RADIUS,mine.mesh.position.x,mine.mesh.position.z,mineHalfWidth,mineHalfWidth);if(overlapsMineHeight&&overlapsMineSquare&&tripmineGrace<=0){mine.armed=false;mine.mesh.visible=false;if(Math.random()<Math.min(.6,upgradeCount('defuse')*.2)){toast('TRIPMINE DEFUSED')}else instantKill('Tripmine')}}}
+function updateGuide(){const marker=$('giftGuide');if(!started||paused||phase!=='collect'){marker.style.display='none';return}const remaining=presents.filter(g=>!g.found&&!g.golden&&g.tile.active);if(!remaining.length){marker.style.display='none';return}if(!showGiftRadar&&got===0){marker.style.display='none';return}let best=remaining[0],distance=Infinity;for(const g of remaining){let d=Math.hypot(g.group.position.x-p.x,g.group.position.z-p.z);if(d<distance){distance=d;best=g}}if(!showGiftRadar&&distance>30){marker.style.display='none';return}const a=Math.atan2(best.group.position.x-p.x,-(best.group.position.z-p.z))-yaw;const angle=Math.atan2(Math.sin(a),Math.cos(a));const dirs=['↑','↗','→','↘','↓','↙','←','↖'];const index=(Math.round(angle/(Math.PI/4))+8)%8;marker.textContent='NEXT GIFT  '+dirs[index]+'  '+Math.round(distance)+'m'+(showGiftRadar?' · RADAR':'');marker.style.display='block'}
+function showGuide(){if(!started||dead||transition)return;guideVisible=!guideVisible;if(guideVisible){paused=true;document.exitPointerLock?.();$('veil').classList.remove('hidden');$('panel').innerHTML='<div class="intermission-tag">FIELD GUIDE</div><h2>HOW TO SURVIVE</h2><p>Collect every regular gift on the four routes. Four routes generate independently. The first three levels remain flat. As maps grow, elevated terraces and long ramps become available from level five, with larger multi-level structures later. When the Beacon opens, return to the central hub as the level collapses from outside inward. Golden gifts are currency for repeatable purchases.</p><p>Blue floating jump pads are beside the tracks: touch one to launch upward (they are non-solid). Glide into any solid vertical wall, thick track side, or pillar to bonk upward. Without Helmet, you must land before gliding again. Helmet lets you resume immediately. Jumping during a glide cancels it unless you own Ninja Belt. Your entire body collides with platforms, but enemies can only hurt your torso. Tripmines replace gifts on the centerline, glow neon purple, and kill on direct contact. Passing safely above them does not trigger them. Approach altars and press F to activate them.</p><p>Use WASD to move, Space to jump, Ctrl to sprint, Shift for shift lock, E for your class ability, Q for class alternate abilities, T to cycle test enemies, and H to reopen this guide.</p><button id="resumeGuide">RESUME RUN</button>';$('resumeGuide').onclick=showGuide;}else{$('veil').classList.add('hidden');paused=false;}}
+function generate(){if($('enemyCue'))setEnemyCue(null);clearCollapseShards();roundGoldCollected=0;while(world.children.length>1){let child=world.children[1];world.remove(child);child.traverse(o=>{if(o.geometry && !o.geometry.userData.persistent && !(o.geometry===portal.geometry||o.geometry===ring.geometry||o.geometry===ring2.geometry||o.geometry===ring3.geometry))o.geometry.dispose()})}tiles=[];presents=[];colliders=[];routeObstacles=[];used=new Set();got=0;total=0;phase='collect';collapseTime=0;dead=false;transition=false;beacon.visible=false;beaconGlow.intensity=0;beaconBeam.material.opacity=0;beamCore.material.opacity=0;portalMat.opacity=0;for(const ray of beaconRays)ray.material.opacity=0;ringMat.emissive.setHex(0x261804);portalInner.material.opacity=0;goldHalo.opacity=0;beaconCrown.material.opacity=0;rnd.seed(1973+level*781+Math.floor(Math.random()*10000));for(let x=-1;x<=1;x++)for(let z=-1;z<=1;z++)createTile(x,z,0,true);
+// Patch 5 study generator: the wiki documents progression unlocks but does not
+// publish the RNG weights or map algorithm. We avoid inventing a mandatory
+// two-up/two-down layout; every branch draws its own sequence of pieces.
+// Grid nodes are contiguous; slopes and terraces grow as level increases.
+const dirs=[[0,-1],[1,0],[0,1],[-1,0]];
+const routePlans=[];
+const rampMaterials=[
+ new THREE.MeshStandardMaterial({color:0xa498bd,roughness:.84,metalness:.05,side:THREE.DoubleSide}),
+ new THREE.MeshStandardMaterial({color:0x16101d,roughness:.83,metalness:.06,side:THREE.DoubleSide})
+];
+const rampRailMaterial=new THREE.MeshStandardMaterial({color:0x3a2c54,emissive:0x221035,emissiveIntensity:.25,roughness:.7});
+// v5.0: prebuild shared ramp geometry (two materials/draw calls instead of 36).
+const rampShapeCache=new Map();
+function makeRampShape(dirX,dirZ,up){
+ const cacheKey=dirX+','+dirZ+','+up;
+ if(rampShapeCache.has(cacheKey))return rampShapeCache.get(cacheKey);
+ const data=[{pos:[],norm:[],uv:[]},{pos:[],norm:[],uv:[]}];
+ const plane=new THREE.PlaneGeometry(tileSize/6+.008,tileSize/6+.008).toNonIndexed();
+ for(let across=0;across<6;across++)for(let along=0;along<6;along++){
+  const u=(across+.5)*tileSize/6-tileSize/2,v=(along+.5)*tileSize/6-tileSize/2;
+  const px=dirZ*u+dirX*v,pz=-dirX*u+dirZ*v;
+  const rotation=new THREE.Euler(dirX!==0?-Math.PI/2:-Math.PI/2+dirZ*up*.124,0,dirX!==0?dirX*up*.124:0);
+  const transform=new THREE.Matrix4().compose(new THREE.Vector3(px,.12+(v/tileSize)*up*.9,pz),new THREE.Quaternion().setFromEuler(rotation),new THREE.Vector3(1,1,1));
+  const segment=plane.clone();segment.applyMatrix4(transform);
+  const dst=data[(across+along)%2];dst.pos.push(...segment.getAttribute('position').array);dst.norm.push(...segment.getAttribute('normal').array);dst.uv.push(...segment.getAttribute('uv').array);segment.dispose();
+ }
+ plane.dispose();const pair=data.map(src=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(src.pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(src.norm,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(src.uv,2));g.computeBoundingSphere();g.userData.persistent=true;return g});
+ rampShapeCache.set(cacheKey,pair);return pair;
+}
+function addVisualRamp(tile,dirX,dirZ,up){
+ const geometries=makeRampShape(dirX,dirZ,up);
+ tile.group.add(new THREE.Mesh(geometries[0],rampMaterials[0]));
+ tile.group.add(new THREE.Mesh(geometries[1],rampMaterials[1]));
+}
+// Because the game's exact generation probabilities are not published, sizes
+// below are reconstruction tuning rather than assertions about the source.
+// Terrain progression is intentionally staged. The reference screenshot shows
+// large upper and lower terraces joined by sustained ramps, not random steps.
+// The exact original procedural probabilities are unknown.
+for(let side=0;side<4;side++){
+ let [dx,dz]=dirs[side],x=dx,z=dz,height=0;
+ // First three levels: four short, predominantly flat branches.
+ // Routes gradually grow, allowing more terrain modules farther from spawn.
+ const baseLength=7+Math.min(32,Math.floor((level-1)*.85));
+ const spread=level<=3?2:level<=7?4:level<=12?7:11;
+ const pieces=Math.min(54,baseLength+Math.floor(rnd.next()*(spread+1)));
+ let flightLeft=0,flightDirection=0,turnCooldown=4;
+ let landingLeft=5,flightsStarted=0;
+ const path=[];
+ for(let i=0;i<pieces;i++){
+  let isRamp=false;
+  // Early paths remain flat; height changes begin only as the map gets bigger.
+  // The first few segments coming away from the spawn are always level.
+  const verticalEligible=level>=5&&i>=Math.max(5,Math.floor(pieces*.28))&&i<pieces-5;
+  if(flightLeft===0&&landingLeft<=0&&verticalEligible){
+   const rampChance=level<8?.055:level<10?.11:level<18?.17:.23;
+   const maxFlights=level<8?1:level<12?2:level<18?3:5;
+   if(flightsStarted<maxFlights&&rnd.next()<rampChance){
+    flightDirection=rnd.next()<.5?-1:1;
+    // Create a recognizable multi-tile climb/descent followed by a FLAT floor.
+    const minFlight=level<8?3:level<10?4:level<18?6:8;
+    const maxFlight=level<8?4:level<10?6:level<18?10:13;
+    flightLeft=Math.min(pieces-i-4,minFlight+Math.floor(rnd.next()*(maxFlight-minFlight+1)));
+    const ceiling=level<8?4:level<10?8:level<18?15:23;
+    if(height+flightLeft>ceiling)flightDirection=-1;
+    if(height-flightLeft< -ceiling)flightDirection=1;
+    flightsStarted++;
+   }
+  }
+  if(flightLeft>0){height+=flightDirection;flightLeft--;isRamp=true;if(flightLeft===0)landingLeft=level<10?5:7;}
+  else landingLeft=Math.max(0,landingLeft-1);
+  // Every branch bends independently, with turns only on flat landings.
+  if(!isRamp&&turnCooldown<=0&&i>=4&&i<pieces-3&&rnd.next()<(level<=3?.035:level<10?.075:.12)){
+   const options=[[dz,-dx],[-dz,dx]].filter(([tx,tz])=>{
+    const nx=x+tx,nz=z+tz;
+    return !used.has(key(nx,nz))&&Math.abs(nx)+Math.abs(nz)>=Math.abs(x)+Math.abs(z)-1;
+   });
+   if(options.length){[dx,dz]=options[Math.floor(rnd.next()*options.length)];turnCooldown=4}
+  }
+  x+=dx;z+=dz;
+  const t=createTile(x,z,side,false,height);
+  if(!t)break;
+  t.branch=side;t.routeStep=i+1;t.isRamp=isRamp;t.grade=isRamp?flightDirection:0;t.terraceY=height;
+  if(isRamp)addVisualRamp(t,dx,dz,flightDirection);
+  makeGift(t,false);total++;path.push(t);
+  turnCooldown--;
+ }
+ for(const t of path)t.branchLength=path.length;
+ routePlans.push({branch:side,length:path.length,minHeight:Math.min(0,...path.map(t=>t.y)),maxHeight:Math.max(0,...path.map(t=>t.y))});
+}
+minimapCellSize=Math.min(12.8,100/Math.max(11,...tiles.map(t=>Math.max(Math.abs(t.x),Math.abs(t.z)))));spawnAltarSet();spawnChallengeTiles();spawnRouteObstacles();if(chosenCurses.includes('randomspawn') && tiles.length>15){const start=tiles[Math.floor(rnd.next()*tiles.length)];hero.position.set(start.x*tileSize,start.y,start.z*tileSize);p.set(start.x*tileSize,start.y,start.z*tileSize)}else{hero.position.set(0,0,10);p.set(0,0,10)}vel.set(0,0,0);yaw=Math.PI;pitch=.27;dashTimer=0;dashCharge=1;diveActive=false;diveCooldown=0;diveAvailable=true;diveRecovery=0;grappleCarry=0;diveJumpCredit=false;chargeActive=false;chargeRecovery=0;chargeDrop=false;gliding=false;glideFlightSpeed=0;glideBonkCooldown=0;glideBoostCooldown=0;glideBonked=false;glideWings.visible=false;stopHook();grounded=false;invulnerable=.7;shield=shieldMax;scene.fog.density=greaterCurses.includes('obl')?.019:.0054;rebuildMobs();updateHud();setMessage('LEVEL '+level,2.2);}
+function updateHud(){$('level').textContent=level;$('gifts').textContent=got+' / '+total;$('gold').textContent=gold;$('phase').textContent=phase==='collect'?(iceLevel?'ICE TILES — FIND ALL GIFTS':highriseLevel?'HIGHRISE — FIND ALL GIFTS':'FIND ALL THE GIFTS'):phase==='collapse'?'COLLAPSE — REACH THE BEACON!':'LEVEL COMPLETE';$('phase').style.color=phase==='collapse'?'#ffc75e':'#d0dafc';$('collapsebar').style.display=phase==='collapse'?'inline-block':'none'}
+let msgTimeout=0;function setMessage(s,secs=2){$('flash').textContent=s;$('flash').style.opacity=1;msgTimeout=secs}function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;setTimeout(()=>$('toast').style.opacity=0,1250)}
+const p=new V(0,0,10),vel=new V(),keys={};let yaw=0,pitch=.35,dist=15,grounded=false,dashTimer=0,dashCharge=1,invulnerable=0,shiftLock=true,mouseDown=false,dragX=0,dragY=0,started=false,paused=true;
+function respawn(){glideBonked=false;gliding=false;glideWings.visible=false;glideFlightSpeed=0;p.set(0,0,10);vel.set(0,0,0);grounded=false;invulnerable=1.2;hero.position.copy(p);toast('RETURNED TO THE HUB')}
+function resetRun(){spiritActive=false;spiritShield=false;spiritFling=false;spiritCooldown=0;spiritStatue.visible=false;spiritOutline.visible=false;hero.scale.setScalar(1);runDistance=0;runGoldCollected=0;guideVisible=false;chaosShopPending=false;lastAltar=null;gold=0;level=1;owned=['paycheck'];chosenEnemies=[];chosenCurses=[];greaterCurses=[];rerolls=3;enemyRerolls=2;speedBonus=0;jumpBonus=0;dashRate=0;goldPerRound=50;shieldMax=0;shield=0;pickupBonus=0;airBonus=0;extraJumps=0;jumpsUsed=0;showGiftRadar=false;levelsCleared=0;deathCount=0;paused=false;generate();$('veil').classList.add('hidden')}
+function gameOver(){setEnemyCue(null);spiritActive=false;spiritStatue.visible=false;spiritOutline.visible=false;hero.scale.setScalar(1);paused=true;dead=true;deathCount++;document.exitPointerLock?.();$('veil').classList.remove('hidden');$('panel').innerHTML=`<div class="intermission-tag">RUN TERMINATED</div><h1>GAME OVER</h1><p>The void claimed you on level <strong>${level}</strong>.</p><div class="score">${levelsCleared} LEVELS CLEARED</div><p>Golden gifts collected: <b class="golden">${gold}</b><br/>Enemy types: ${chosenEnemies.length} · Active curses: ${chosenCurses.length+greaterCurses.length}</p><button id="restart">NEW RUN</button>`;$('restart').onclick=()=>{resetRun();renderer.domElement.requestPointerLock?.()};} 
+function lose(){if(dead||transition)return;setMessage('LOST TO THE VOID',1.7);$('damage-flash').style.opacity=1;setTimeout(()=>$('damage-flash').style.opacity=0,600);gameOver()}
+function instantKill(label){if(dead||transition)return;invulnerable=0;shield=0;toast(label.toUpperCase()+' INSTA-KILL');lose()}
+function startCollapse(){phase='collapse';collapseTime=0;collapseHudElapsed=0;beacon.visible=true;portalMat.opacity=.32;portalInner.material.opacity=.92;beaconGlow.intensity=22;beaconBeam.material.opacity=.42;beamCore.material.opacity=.9;goldHalo.opacity=.95;beaconCrown.material.opacity=.6;ringMat.emissive.setHex(0xfff1cc);for(const t of presents){t.group.visible=false}presents=[];for(const t of tiles)if(!t.hub&&!tripmines.some(m=>m.armed&&m.tile===t))makeGift(t,true);
+// All branches collapse from their OUTERMOST tiles toward the hub.
+const maximumDepth=Math.max(...tiles.filter(t=>!t.hub).map(t=>t.routeStep));
+for(const t of tiles){if(t.hub){t.collapseAt=Infinity;continue;}const layer=(t.branchLength||maximumDepth)-t.routeStep;t.collapseAt=(chosenCurses.includes('fastercollapse')?2.5:4.5)+(greaterCurses.includes('inverse')?t.routeStep:layer)*(chosenCurses.includes('fastercollapse')?1.65:2.65)+rnd.next()*.35;}
+for(const ray of beaconRays)ray.material.opacity=.42;setMessage('BEACON OPEN — COLLAPSE!',3);updateHud()}
+// Between-level structure: enemy selection, curse selection, repeatable shop, and occasional greater curse.
+const upgrades=[
+{id:'adrenaline',name:'Adrenaline',cost:50,min:3,max:1,desc:'20% movement speed in solo play.',apply:()=>speedBonus+=.20},
+{id:'morealtars',name:'More Altars',cost:600,min:10,max:1,desc:'Spawns one additional altar on each new level.',apply:()=>{}},
+{id:'paycheck',name:'Paycheck',cost:55,min:3,max:5,desc:'Extra golden gifts after a successful escape.',apply:()=>goldPerRound+=50},
+{id:'license',name:'Business License',cost:75,min:3,max:2,desc:'25% more golden gifts gained per stack (income effect approximated).',apply:()=>{}},
+{id:'swiftness',name:'Swiftness Ring',cost:80,min:3,max:3,desc:'Increased running speed.',apply:()=>speedBonus+=.10},
+{id:'betterpads',name:'Better Jump Pads',cost:50,min:5,max:1,desc:'Adds and improves the placement of blue jump pads.',apply:()=>{}},
+{id:'defuse',name:'Defuse Kit',cost:30,min:5,max:3,desc:'Each stack gives a 20% chance to defuse a tripmine on contact.',apply:()=>{}},
+{id:'doublejump',name:'Double Jump',cost:150,min:5,max:1,desc:'Grants an air jump; with Glider + Ninja Belt, it boosts speed without ending glide.',apply:()=>extraJumps++},
+{id:'grapple',name:'Grapple Points',cost:100,min:5,max:1,desc:'Improves aerial control (grapple points not yet modeled).',apply:()=>airBonus+=.15},
+{id:'medal',name:'Medal',cost:100,min:5,max:1,desc:'Earn an additional golden gift after escape (approximation).',apply:()=>goldPerRound+=1},
+{id:'radar',name:'Radar',cost:175,min:5,max:1,desc:'Marks distant gifts using HUD direction.',apply:()=>showGiftRadar=true},
+{id:'tria',name:'Tria Orbs',cost:100,min:5,max:1,desc:'Provides a defensive charge (orb mechanics pending).',apply:()=>shieldMax++},
+{id:'coil',name:'Advanced Gravity Coil',cost:600,min:8,max:1,desc:'Enhanced jump ability (approximate effect).',apply:()=>jumpBonus+=.28},
+{id:'fanny',name:'Fanny Pack',cost:300,min:8,max:1,desc:'Highlights bonus golden-gift tiles during collapse (effect pending).',apply:()=>{}},
+{id:'wings',name:'Grace Wings',cost:200,min:8,max:1,desc:'Greatly improves air steering (flight mechanics pending).',apply:()=>airBonus+=.26},
+{id:'helmet',name:'Helmet',cost:400,min:8,max:1,desc:'Glider can resume gliding immediately after wall bonking and use air jumps while bonked.',apply:()=>{}},
+{id:'skates',name:'Ice Skates',cost:300,min:8,max:1,desc:'Enhanced movement speed (ice not yet implemented).',apply:()=>speedBonus+=.08},
+{id:'bell',name:'Pocket Bell',cost:300,min:8,max:1,desc:'Adds one extra jump when Bell is an active enemy.',apply:()=>extraJumps++},
+{id:'magnet',name:'Gift Magnet',cost:1500,min:15,max:3,desc:'Increases gift collection radius by 0.5 per stack.',apply:()=>pickupBonus+=.5},
+{id:'sharktail',name:'Shark Tail',cost:1200,min:15,max:1,desc:'Hold Q while Gliding for a powerful speed boost, larger gift reach and heavier stamina drain (prototype tuning).',apply:()=>{}},
+{id:'ninjabelt',name:'Ninja Belt',cost:500,min:13,max:1,desc:'Jumping during Glider flight no longer cancels flight; available air jumps give a speed boost.',apply:()=>{}},
+{id:'sports',name:'Sport Shoes',cost:1350,min:15,max:1,desc:'40% movement-speed increase.',apply:()=>speedBonus+=.40},
+{id:'shield',name:'Shield',cost:1000,min:15,max:1,desc:'Blocks one non-void hit per round.',apply:()=>shieldMax+=1},
+{id:'idol',name:'Gift Idol',cost:4000,min:20,max:5,desc:'Each stack gives a 1% chance to collect nearby gifts automatically (effect approximated).',apply:()=>{}}
+];
+const enemyCatalog=[
+{id:'mart',name:'Mart',min:1,desc:'Blue antlered slime in a fedora; slowly pursues the player.',color:0x22a8ee,speed:2.9},
+{id:'baby',name:'Baby',min:1,desc:'Telegraphs a straight-line dash toward a player.',color:0xf0b7b2,speed:5.4},
+{id:'bell',name:'Bell',min:1,desc:'A bell that disorients and launches players when touched.',color:0xb1b5cb,speed:2.0},
+{id:'springer',name:'Springer',min:1,desc:'Leaping chess knight that creates a shockwave on landing.',color:0xa799ed,speed:3.2},
+{id:'husk',name:'Husk',min:1,desc:'Dark mimic that follows the player’s earlier footsteps.',color:0x522776,speed:4.0},
+{id:'icbm',name:'ICBM',min:1,desc:'Tracks a target before launching an explosive strike.',color:0xc5653c,speed:4.5},
+{id:'flesh',name:'Flesh',min:5,desc:'Flesh enemy that spreads hazardous infection.',color:0xb93345,speed:2.5},
+{id:'operator',name:'Operator',min:5,desc:'Green / yellow / red traffic signal; stop before the warning expires.',color:0xccccbc,speed:2.2},
+{id:'guardian',name:'Guardian',min:8,desc:'Shoots a volley of projectiles.',color:0xfaa23f,speed:2.2},
+{id:'telefragger',name:'Telefragger',min:8,desc:'Teleports in front of the player.',color:0xd35aea,speed:4.0},
+{id:'kolona',name:'Kolóna',min:10,desc:'Shows a target number; use ability exactly when its count reaches it.',color:0xd2f3fa,speed:2.7},
+{id:'voidbaby',name:'Voidbound Baby',min:10,desc:'A faster, more dangerous version of Baby.',color:0xc8a5fe,speed:7.0},
+{id:'cadence',name:'Cadence',min:15,desc:'Instruments must be collected to prevent enraging it.',color:0xee9ba2,speed:2.8},
+{id:'voidicbm',name:'Voidbound ICBM',min:15,desc:'Creates a wider pattern of explosions.',color:0x7da3d7,speed:5.0},
+{id:'voidbreaker',name:'Voidbreaker',min:15,desc:'Summons swords around the player.',color:0xf0c0e6,speed:3.7},
+{id:'sigil',name:'Sigil',min:20,desc:'Fires a long-lasting tracking beam.',color:0xffdf9f,speed:3.5},
+{id:'voidguardian',name:'Voidbound Guardian',min:20,desc:'Larger, more dangerous volleys.',color:0x89aaff,speed:3.6},
+{id:'scrapmaw',name:'Scrapmaw',min:25,desc:'Blitzes across the arena with beams.',color:0xf67d47,speed:5.7}
+];
+const curseCatalog=[
+{id:'lowergravity',name:'Lower Gravity',min:1,desc:'Gravity is lower; jumps and falls take longer.'},
+{id:'randomspawn',name:'Random Spawn',min:1,desc:'Spawn at a random safe platform.'},
+{id:'weakerpads',name:'Weaker Jump Pads',min:1,desc:'Jumping assistance is weakened (prototype approximation).'},
+{id:'scattered',name:'Scattered Gifts',min:1,desc:'Some gifts shift away from the centerline.'},
+{id:'morebells',name:'More Ringing',min:1,desc:'Additional bell hazards appear.'},
+{id:'biggerMarts',name:'Bigger Marts',min:1,desc:'Mart grows larger and harder to avoid.'},
+{id:'fastercollapse',name:'Scorched Earth',min:1,desc:'Destruction becomes more dangerous (prototype: faster collapse).'},
+{id:'moretraps',name:'More Tripmines',min:5,desc:'Additional tripmine hazards (not yet simulated).'},
+{id:'biggerblast',name:'Bigger Blast',min:5,desc:'Explosions cover more space (not yet simulated).'},
+{id:'fasterbabies',name:'Problem Child',min:5,desc:'Baby moves more aggressively (prototype approximation).'},
+{id:'biggertripmines',name:'Bigger Tripmines',min:5,desc:'Larger tripmine hazards (not yet simulated).'},
+{id:'huskpresence',name:'Husk Presence',min:1,desc:'Adds Husks to the threat pool.'}
+];
+const greaterCatalog=[
+{id:'obl',name:'Oblivion',min:10,desc:'Significantly obscures the arena (prototype approximation).'},
+{id:'inverse',name:'Inverse Destruction',min:15,desc:'Reverses collapse direction (in this run only).'},
+{id:'hollow',name:'Hollow Tiles',min:15,desc:'Some tiles become unsafe (prototype approximation).'},
+{id:'legion',name:'Legion',min:10,desc:'More enemies appear (prototype approximation).'},
+{id:'malfunction',name:'Malfunction',min:10,desc:'Your movement abilities become less reliable (approximation).'}
+];
+let owned=[],chosenEnemies=[],chosenCurses=[],greaterCurses=[],shopOffers=[],shopPurchases=0,stageQueue=[],rerolls=3,enemyRerolls=2;
+let activeClass='charger',difficulty='standard',deathCount=0,levelsCleared=0,abilityPressed=false,gliding=false;let dashRate=0,goldPerRound=0,shieldMax=0,shield=0,pickupBonus=0,airBonus=0,extraJumps=0,jumpsUsed=0,showGiftRadar=false;
+let abilitySerial=0,operatorCue=null,kolonaCue=null;let mobs=[],enemyMeshes=[];let playerTrail=[],trailClock=0,abilityPulse=0,enemyHintClock=0,testGroupIndex=-1;let infectedTiles=new Map();
+function randChoices(catalog,n=3){return [...catalog].sort(()=>Math.random()-.5).slice(0,n)}
+function displayIntermission(content){paused=true;document.exitPointerLock?.();$('veil').classList.remove('hidden');$('panel').innerHTML=content;}
+function startNextLevel(){spiritActive=false;spiritStatue.visible=false;spiritOutline.visible=false;hero.scale.setScalar(1);level++;generate();$('veil').classList.add('hidden');paused=false;transition=false;}
+function proceedStage(){if(!stageQueue.length){startNextLevel();return}const kind=stageQueue.shift();if(kind==='enemy')showVote('enemy');else if(kind==='curse')showVote('curse');else if(kind==='greater')showVote('greater');else {boughtThisShop={};shopPurchases=0;rollShop();showShop()}}
+function showVote(kind){const isEnemy=kind==='enemy',isGreater=kind==='greater';const pool=(isEnemy?enemyCatalog:isGreater?greaterCatalog:curseCatalog).filter(c=>(c.min||1)<=level);const label=isEnemy?'SELECT AN ENEMY':isGreater?'CHOOSE A GREATER CURSE':'CHOOSE A CURSE';const options=randChoices(pool);
+const left=isEnemy?enemyRerolls:rerolls;
+displayIntermission(`<div class="intermission-tag">INTERMISSION · LEVEL ${level} COMPLETE</div><h2>${label}</h2><p>${isEnemy?'Your choice introduces a persistent enemy to subsequent levels.':'Choose a permanent hazard affecting your future levels.'}</p><div class="option-grid">${options.map((c,i)=>`<button class="choice" data-choice="${i}"><strong>${c.name}</strong><em>${c.desc}</em></button>`).join('')}</div><button id="reroll" ${left<=0?'disabled':''}>REROLL CHOICES (${left})</button><div class="muted">An option must be chosen to continue.</div>`);
+$('panel').querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>{const c=options[Number(b.dataset.choice)];if(isEnemy)chosenEnemies.push(c.id);else if(isGreater)greaterCurses.push(c.id);else chosenCurses.push(c.id);proceedStage();});
+$('reroll').onclick=()=>{if(isEnemy&&enemyRerolls>0){enemyRerolls--;showVote(kind)}else if(!isEnemy&&rerolls>0){rerolls--;showVote(kind)}};
+}
+// Verified wiki-based minimum levels, prerequisites, and solo-stack pricing.
+let boughtThisShop={};
+function upgradeCount(id){return owned.filter(x=>x===id).length}
+function eligibleUpgrade(u){
+ if(level<(u.min||1)||upgradeCount(u.id)>=(u.max||1))return false;
+ if((u.id==='bell')&&(!chosenEnemies.includes('bell')||!owned.includes('doublejump')))return false;
+ if(u.id==='idol'&&!owned.includes('magnet'))return false;
+ if(u.id==='sharktail'&&activeClass==='prisoner')return false;
+ if(u.id==='defuse'&&difficulty==='casual')return false;
+ if(u.id==='swiftness'&&boughtThisShop[u.id])return false;
+ if(u.id==='paycheck'&&boughtThisShop[u.id])return false;
+ return true;
+}
+function upgradeCost(u){
+ const stack=upgradeCount(u.id);
+ if(u.id==='license')return Math.ceil([75,187.5][Math.min(stack,1)]);
+ if(u.id==='magnet')return (difficulty==='casual'?[750,1050,1350]:[1500,2100,2700])[Math.min(stack,2)];
+ if(u.id==='idol')return (difficulty==='casual'?[3000,6000,9000,12000,12000]:[4000,8000,12000,16000,16000])[Math.min(stack,4)];
+ if(u.id==='sharktail')return difficulty==='casual'?800:1200;
+ if(u.id==='wings')return 200; // solo
+ if(u.id==='ninjabelt')return 500; // solo
+ if(u.id==='skates')return 300; // solo
+ if(u.id==='shield')return 1000; // solo
+ return u.cost;
+}
+function rollShop(){
+ const available=upgrades.filter(eligibleUpgrade);
+ shopOffers=randChoices(available,2).map(x=>x.id);
+}
+function showShop(){
+ let items=shopOffers.map(id=>upgrades.find(u=>u.id===id)).filter(u=>u&&eligibleUpgrade(u));
+ if(!items.length){rollShop();items=shopOffers.map(id=>upgrades.find(u=>u.id===id)).filter(Boolean)}
+ if(!items.length){proceedStage();return}
+ const card=(u,i)=>{const price=upgradeCost(u);return `<button class="choice" data-buy="${i}" ${gold<price?'disabled':''}><span class="intermission-tag">PEDESTAL ${i===0?'LEFT':'RIGHT'}</span><strong>${u.name}</strong><em>${u.desc}</em><span class="cost">✦ ${price} GOLDEN GIFTS</span><span class="muted">LEVEL ${u.min||1}+ · OWNED ${upgradeCount(u.id)} / ${u.max||1}</span></button>`};
+ displayIntermission(`<div class="intermission-tag">INTERMISSION · UPGRADE SHOP</div><h2>BLESSINGS & UPGRADES</h2><p class="shop-stat">Golden gifts available: <b class="golden">✦ ${gold}</b> &nbsp;·&nbsp; Purchased this visit: <b>${shopPurchases}</b></p><div class="option-grid">${card(items[0],0)}<button class="choice" id="continue"><strong>CONTINUE</strong><em>Exit the shop and enter the next level. Unspent gold carries over.</em></button>${items[1]?card(items[1],1):'<div></div>'}</div><p class="muted">Only unlocked upgrades appear. Prices reflect the current stack. Buy as many as you can afford.</p>`);
+ $('continue').onclick=proceedStage;
+ $('panel').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const u=items[Number(b.dataset.buy)];if(!u||!eligibleUpgrade(u))return;const price=upgradeCost(u);if(gold<price)return;gold-=price;owned.push(u.id);boughtThisShop[u.id]=(boughtThisShop[u.id]||0)+1;u.apply();shopPurchases++;updateHud();rollShop();showShop();});
+}
+function roundEnd(){if(transition)return;levelsCleared++;transition=true;phase='complete';gold+=goldPerRound;if(upgradeCount('license'))gold+=Math.round(roundGoldCollected*upgradeCount('license')*.25);updateHud();paused=true;rerolls+=level%7===0?1:0;enemyRerolls+=level%5===0?1:0;
+// Standard-inspired intervals. First enemy is selected after the first level; further choices follow even-numbered rounds.
+stageQueue=[];if(level===1||level%2===0)stageQueue.push('enemy');if(level%2===0&&level!==10&&level%10!==0)stageQueue.push('curse');if([3,5,8,0].includes(level%10))stageQueue.push('shop');if(chaosShopPending){stageQueue.push('shop');chaosShopPending=false;}if(level%10===0)stageQueue.push('greater');
+if(!stageQueue.length){displayIntermission(`<div class="intermission-tag">LEVEL ${level} COMPLETE</div><h2>ESCAPED THE COLLAPSE</h2><p>You have <strong class="golden">✦ ${gold} golden gifts</strong> saved for the next shop.</p><button id="next" class="wide">NEXT LEVEL</button>`);$('next').onclick=startNextLevel;return}
+shopPurchases=0;proceedStage();}
+// Threat simulation: independent behaviour archetypes with readable warning windows.
+let attacks=[], threatClock=0;
+const dangerMaterial=new THREE.MeshBasicMaterial({color:0xff3e65,transparent:true,opacity:.65,depthWrite:false,side:THREE.DoubleSide});
+const pulseMaterial=new THREE.MeshBasicMaterial({color:0xffb452,transparent:true,opacity:.7,depthWrite:false,side:THREE.DoubleSide});
+function attackMarker(x,z,r,color=0xff5367){const mesh=new THREE.Mesh(new THREE.RingGeometry(Math.max(.1,r-.16),r,40),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.7,side:THREE.DoubleSide,depthWrite:false}));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.14,z);world.add(mesh);return mesh}
+function releaseAttack(a){if(a.mesh){world.remove(a.mesh);a.mesh.geometry?.dispose();a.mesh.material?.dispose()}if(a.secondary){world.remove(a.secondary);a.secondary.geometry?.dispose();a.secondary.material?.dispose()}}
+function clearAttacks(){for(const a of attacks)releaseAttack(a);attacks=[];for(const m of mobs)if(m.warning){world.remove(m.warning);m.warning=null} }
+function hazardHit(label){if(invulnerable>0||dead||transition)return;if(spiritActive){if(spiritShield){spiritShield=false;spiritOutline.visible=false;invulnerable=.32;toast('SPIRIT SHIELD ABSORBED '+label.toUpperCase());return}else{instantKill('Spirit hit twice');return}}invulnerable=1.55;$('damage-flash').style.opacity=1;setTimeout(()=>$('damage-flash').style.opacity=0,320);if(shield>0){shield--;toast('SHIELD BLOCKED '+label.toUpperCase());return}toast('HIT BY '+label.toUpperCase());lose()}
+function threatBurst(x,z,r,delay,label){const mesh=attackMarker(x,z,r);attacks.push({type:'burst',x,z,r,t:0,delay,mesh,label});}
+function threatBolt(x,z,dx,dz,speed,label,size=.55){const mesh=new THREE.Mesh(new THREE.OctahedronGeometry(size,0),new THREE.MeshBasicMaterial({color:0xffb061}));mesh.position.set(x,1.3,z);world.add(mesh);attacks.push({type:'bolt',x,z,dx,dz,speed,t:0,mesh,label});}
+function makeEnemyVisual(def){
+ const g=new THREE.Group(),id=def.id;
+ const mat=(c,em=0)=>new THREE.MeshStandardMaterial({color:c,roughness:.57,metalness:.1,flatShading:true,emissive:c,emissiveIntensity:em});
+ const dark=mat(0x17141e),ink=mat(0x07070d),ivory=mat(0xe9e5db),metal=mat(0x626571),silver=mat(0xabb0b9),purple=mat(0x351449,.25),pink=mat(0xf6a7bb,.12),gold=mat(0xc78b3d,.18),red=mat(0xc52743,.28);
+ const shape=(geo,material,x=0,y=0,z=0,parent=g)=>{const o=new THREE.Mesh(geo,material);o.position.set(x,y,z);parent.add(o);return o};
+ const ball=(r,m,x,y,z,sx=1,sy=1,sz=1)=>{const o=shape(new THREE.SphereGeometry(r,14,10),m,x,y,z);o.scale.set(sx,sy,sz);return o};
+ const cube=(w,h,d,m,x,y,z)=>shape(new THREE.BoxGeometry(w,h,d),m,x,y,z);
+ const tube=(a,b,r,m,segments=7)=>{const d=new THREE.Vector3().subVectors(new THREE.Vector3(...b),new THREE.Vector3(...a));const o=shape(new THREE.CylinderGeometry(r,r,d.length(),segments),m,...new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5).toArray());o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());return o};
+ const horn=(x,y,z,scale=1,m=silver)=>{tube([x,y,z],[x*1.4,y+.78*scale,z],.075*scale,m);tube([x*1.4,y+.38*scale,z],[x*1.9,y+.72*scale,z],.055*scale,m);tube([x*1.4,y+.5*scale,z],[x*.95,y+.95*scale,z],.045*scale,m)};
+ const eye=(x,y,z,r=.11)=>{ball(r,ivory,x,y,z,1,.85,.38);ball(r*.53,ink,x,y,z-.045,1,1,.52)};
+ const teeth=(width,y,z,n=7)=>{for(let i=0;i<n;i++)cube(width/n*.74,.11,.1,ivory,(i-(n-1)/2)*width/n,y,z)};
+ if(id==='mart'){
+   const blue=mat(0x169ce0,.23);ball(.94,blue,0,-.24,0,1.14,.83,.92);ball(.46,blue,0,.13,0,1.3,.75,1);
+   eye(-.32,.03,-.82,.14);eye(.32,.03,-.82,.14);
+   const smile=shape(new THREE.TorusGeometry(.29,.055,5,18,Math.PI),ink,0,-.33,-.84);smile.rotation.z=Math.PI;
+   cube(1.47,.13,1.35,ink,0,.59,0);shape(new THREE.CylinderGeometry(.55,.58,.55,12),ink,0,.93,0);cube(1.16,.095,1.16,ivory,0,.74,0);
+   horn(-.6,.45,0,1.0);horn(.6,.45,0,1.0);
+ }else if(id==='baby'||id==='voidbaby'){
+   const ghost=id==='voidbaby',skin=ghost?mat(0x37244e,.28):mat(0xf0c9d7,.18),mask=ghost?mat(0x4b2f73,.4):mat(0xe88ebc,.17);
+   ball(.87,ivory,0,0,0,.9,1.08,.72);ball(.9,skin,0,.18,.19,1,.7,.88);
+   for(const s of [-1,1]){ball(.22,ink,s*.34,.1,-.66,1.1,1,.4);ball(.075,ivory,s*.31,.13,-.745);}
+   const jaw=ball(.69,ink,0,-.55,-.32,1,.62,.54);teeth(1.03,-.36,-.80,9);
+   for(let j=0;j<5;j++){const t=shape(new THREE.ConeGeometry(.1,.3,5),ivory,(j-2)*.24,-.7,-.65);t.rotation.z=Math.PI}
+   ball(.72,mask,0,.38,.24,1.15,.45,.88);
+   if(ghost){horn(-.52,.45,.1,1.15,ivory);horn(.52,.45,.1,1.15,ivory)}else{for(const s of [-1,1])ball(.24,skin,s*.76,.6,.13,.6,.95,.6)}
+ }else if(id==='bell'){
+   const bellmetal=mat(0x747780,.17);shape(new THREE.CylinderGeometry(.28,.91,1.8,14,1),bellmetal,0,.04,0);
+   shape(new THREE.TorusGeometry(.91,.12,7,24),silver,0,-.83,0).rotation.x=Math.PI/2;
+   ball(.29,metal,0,-.98,0);shape(new THREE.CylinderGeometry(.24,.31,.22,10),metal,0,1.03,0);
+   tube([0,1.15,0],[0,2.6,0],.08,metal);for(let i=0;i<5;i++)ball(.10,metal,0,1.25+i*.29,0);
+   for(const [x,y,z] of [[-.29,.35,-.54],[.32,.14,-.69],[.05,-.41,-.81]])eye(x,y,z,.19);
+   for(let i=0;i<12;i++){const a=i*Math.PI/6;const s=shape(new THREE.ConeGeometry(.15,.42,4),metal,Math.cos(a)*.9,-.66,Math.sin(a)*.9);s.rotation.z=-Math.cos(a)*.7;s.rotation.x=Math.sin(a)*.7}
+   tube([-.82,.4,0],[.76,-.15,.6],.055,dark);
+ }else if(id==='springer'){
+   const stone=mat(0xaaa5b4,.05),shade=mat(0x494557);
+   shape(new THREE.CylinderGeometry(.8,.97,.32,8),shade,0,-.96,0);
+   shape(new THREE.CylinderGeometry(.56,.82,.32,8),stone,0,-.66,0);
+   shape(new THREE.CylinderGeometry(.39,.56,.65,8),stone,0,-.19,0);
+   const horse=shape(new THREE.BoxGeometry(.72,1.1,.78),stone,0,.59,0);horse.rotation.x=-.32;
+   const muzzle=ball(.55,stone,0,.82,-.52,.7,.48,1.15);ball(.37,shade,0,1.21,-.17,.74,.88,.84);
+   for(const s of [-1,1]){const ear=shape(new THREE.ConeGeometry(.17,.65,5),stone,s*.26,1.64,.03);ear.rotation.z=s*-.18;eye(s*.3,1.05,-.81,.065)}
+   cube(.25,.28,.3,shade,0,.68,-1.12);
+ }else if(id==='husk'){
+   const flesh=mat(0x341449,.35),outline=mat(0x1b0926,.38);
+   cube(.83,1.35,.48,flesh,0,-.11,0);ball(.54,flesh,0,.95,0,1,1.2,.72);
+   for(const s of [-1,1]){tube([s*.39,.32,0],[s*.62,-.71,0],.16,outline);tube([s*.27,-.61,0],[s*.33,-1.45,0],.18,outline);eye(s*.22,1.06,-.40,.13)}
+   cube(.62,.74,.22,ink,0,.49,-.43);teeth(.58,.79,-.57,8);teeth(.58,.26,-.57,8);
+ }else if(id==='icbm'||id==='voidicbm'){
+   const shell=mat(id==='icbm'?0x7b878b:0x393d67,.22),lime=mat(0x77c98c,.3);
+   shape(new THREE.CylinderGeometry(.47,.47,2.65,12),shell,0,0,0);
+   shape(new THREE.ConeGeometry(.47,1.03,12),shell,0,1.83,0);
+   shape(new THREE.CylinderGeometry(.48,.65,.34,12),metal,0,-1.43,0);
+   for(let a=0;a<4;a++){const theta=a*Math.PI/2,x=Math.cos(theta),z=Math.sin(theta);const fin=shape(new THREE.BoxGeometry(.75,.72,.13),shell,x*.69,-1.05,z*.69);fin.rotation.y=-theta;shape(new THREE.CylinderGeometry(.14,.14,1.6,7),metal,x*.55,0,z*.55)}
+   for(let j=0;j<3;j++)shape(new THREE.TorusGeometry(.485,.055,5,12),j===1?lime:dark,0,.42-j*.6,0).rotation.x=Math.PI/2;
+ }else if(id==='operator'){
+   const coat=mat(0x2d3035);shape(new THREE.CylinderGeometry(.35,.93,2.4,6),coat,0,-.38,0);
+   cube(.7,1.25,.65,dark,0,.75,0);
+   const lightFace=mat(0x5bdc91,.85);const opLamp=ball(.4,lightFace,0,1.1,-.41,.88,.72,.4);g.userData.operatorLamp=opLamp;
+   eye(-.15,1.13,-.6,.075);eye(.15,1.13,-.6,.075);
+   cube(.86,.2,.8,coat,0,1.64,0);for(let s of [-1,1])tube([s*.63,.5,0],[s*.88,-.8,0],.13,coat);
+ }else if(id==='telefragger'){
+   const grey=mat(0x44464e,.15);ball(.36,grey,0,1.05,0);tube([0,.74,0],[0,-.49,0],.16,grey);for(let s of [-1,1]){tube([0,.52,0],[s*.77,-.22,0],.12,grey);tube([0,-.47,0],[s*.49,-1.28,0],.12,grey)}
+   eye(-.12,1.08,-.32,.075);eye(.12,1.08,-.32,.075);
+ }else if(id==='guardian'||id==='voidguardian'){
+   const voided=id==='voidguardian',skull=voided?mat(0x67447e,.3):mat(0xf1aac2,.19),flower=mat(0xe3497c,.3);
+   ball(.89,skull,0,.22,0,1,.9,.85);ball(.72,skull,0,-.38,-.08,1,.56,.75);
+   for(const s of [-1,1])ball(.3,ink,s*.36,.29,-.66,1,1.2,.42);ball(.18,ink,0,-.03,-.78,1,.75,.4);teeth(.93,-.64,-.66,8);
+   for(let i=0;i<9;i++){const a=i*Math.PI*2/9;const x=Math.cos(a)*.97,y=.2+Math.sin(a)*.84;ball(.23,flower,x,y,-.05,.68,.68,.35);ball(.095,gold,x,y,-.28)}
+   if(voided){cube(.94,.23,.47,ink,0,-1.03,-.15);teeth(.85,-.94,-.49,7)}
+ }else if(id==='flesh'){
+   const bone=mat(0xd9c7a5),meat=mat(0xb52b3b,.16);tube([0,-1.25,0],[0,.12,0],.3,bone);
+   for(let i=0;i<5;i++){const x=(i-2)*.25;tube([x*.45,.04,0],[x,.75+(.5-Math.abs(i-2)*.1),-.1],.09,bone);ball(.19,meat,x*.62,.15,.07)}
+   for(let i=0;i<8;i++)ball(.25,meat,Math.sin(i*4)*.28,-.7+i*.2,Math.cos(i*3)*.23,.7,1.3,.8);
+ }else if(id==='kolona'){
+   const flame=mat(0xf6a33b,.55),hot=mat(0xffe48d,.7),green=mat(0x5e9554,.13);
+   shape(new THREE.ConeGeometry(.7,2,7),flame,0,.35,0);ball(.59,hot,0,.08,-.25,1,1,.5);
+   for(let i=0;i<3;i++)eye((i-1)*.3,.4,-.64,.13);
+   shape(new THREE.TorusGeometry(1.15,.14,7,20),green,0,-.8,0).rotation.x=Math.PI/2;
+   for(let b=0;b<9;b++){const a=b*Math.PI*2/9;ball(.3,green,Math.cos(a)*1.09,-.7,Math.sin(a)*1.09,1,.6,.8)}
+   const pillar=new THREE.Group();pillar.position.set(0,.3,.85);g.add(pillar);
+   const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.18,.22,2.4,6),metal);pillar.add(shaft);
+   const cap=new THREE.Mesh(new THREE.ConeGeometry(.33,.5,6),gold);cap.position.y=1.42;pillar.add(cap);
+   g.userData.kolonaPillar=pillar;g.userData.kolonaFlame=flame;
+ }else if(id==='voidbreaker'){
+   const armor=mat(0x3c3659,.25);cube(.9,1.35,.62,armor,0,-.05,0);ball(.47,armor,0,.94,0,1,.9,.8);for(let s of [-1,1]){ball(.3,armor,s*.6,.45,0);tube([s*.26,-.5,0],[s*.34,-1.35,0],.2,armor)}
+   tube([.72,-.65,-.25],[.87,1.5,-.25],.13,ink);shape(new THREE.ConeGeometry(.22,.92,4),red,.87,1.92,-.25);
+ }else if(id==='sigil'){
+   const sun=mat(0xffc35a,.5);shape(new THREE.OctahedronGeometry(.85,0),sun);ball(.32,ivory,0,.05,-.66,1,1,.4);ball(.17,ink,0,.05,-.88);
+   for(let i=0;i<8;i++){let a=i*Math.PI/4;const point=shape(new THREE.ConeGeometry(.19,.72,4),sun,Math.cos(a)*1.01,Math.sin(a)*1.01,0);point.rotation.z=a-Math.PI/2}
+ }else if(id==='cadence'){
+   const clockmetal=mat(0x8a8b98,.1);shape(new THREE.CylinderGeometry(.9,.9,.36,16),clockmetal,0,0,0).rotation.x=Math.PI/2;
+   ball(.78,ivory,0,0,-.24,1,1,.12);for(let k=0;k<12;k++){let a=k*Math.PI/6;ball(.035,ink,Math.cos(a)*.61,Math.sin(a)*.61,-.36)}
+   tube([0,0,-.38],[.31,.38,-.38],.055,ink);tube([0,0,-.38],[-.4,.06,-.38],.045,ink);
+   for(const s of [-1,1]){tube([s*.82,-.15,0],[s*.82,-1.5,0],.07,metal);ball(.17,metal,s*.82,-1.5,0)}
+ }else if(id==='scrapmaw'){
+   const steel=mat(0x375767,.15),rust=mat(0xb86b36,.15);for(let i=0;i<4;i++){const segment=cube(.88,.69,1.07,i%2?steel:metal,0,0,i*.78);for(let s of [-1,1])ball(.18,rust,s*.54,0,i*.78)}
+   const jaws=ball(.81,steel,0,.2,-.85,.85,.55,1.15);for(let s of [-1,1]){eye(s*.35,.35,-1.55,.14);for(let j=0;j<3;j++)shape(new THREE.ConeGeometry(.09,.34,5),ivory,s*(.18+j*.17),-.25,-1.46)}
+ }else{
+   const core=mat(def.color,.32);shape(new THREE.IcosahedronGeometry(.89,1),core);eye(-.2,.1,-.77,.14);eye(.2,.1,-.77,.14);
+ }
+ // Common faint aura, not a replacement for the character's silhouette.
+ const aura=shape(new THREE.TorusGeometry(1.02,.027,4,30),new THREE.MeshBasicMaterial({color:def.color,transparent:true,opacity:.32,depthWrite:false}),0,-1.55,0);aura.rotation.x=Math.PI/2;
+ return g;
+}
+function rebuildMobs(){setEnemyCue(null);playerTrail=[];trailClock=0;infectedTiles.clear();for(const obj of mobs){if(obj.warning)world.remove(obj.warning);for(const item of obj.instruments||[])world.remove(item.mesh)}for(const m of enemyMeshes){world.remove(m);m.traverse(x=>{if(x.geometry&&!x.geometry.userData.persistent)x.geometry.dispose()})}clearAttacks();enemyMeshes=[];mobs=[];
+const counts={};for(const id of chosenEnemies)counts[id]=(counts[id]||0)+1;if(chosenCurses.includes('huskpresence'))counts.husk=(counts.husk||0)+1;if(chosenCurses.includes('morebells'))counts.bell=(counts.bell||0)+1;
+for(const def of enemyCatalog){let number=Math.min(8,(counts[def.id]||0)*(greaterCurses.includes('legion')?2:1));for(let i=0;i<number;i++){const gr=makeEnemyVisual(def);if(def.id==='mart'&&chosenCurses.includes('biggerMarts'))gr.scale.setScalar(1.6);const possible=tiles.filter(t=>!t.hub&&t.depth>=3),spawn=possible[Math.floor(Math.random()*possible.length)];gr.position.set((spawn?.x||3)*tileSize,(spawn?.y||0)+2,(spawn?.z||3)*tileSize);if(def.id==='bell')placeBellNearPlayer(gr);world.add(gr);enemyMeshes.push(gr);mobs.push({mesh:gr,def,drift:Math.random()*6.28,hitCooldown:0,cooldown:2+Math.random()*2,mode:'seek',windup:0,charge:0,target:new V(),lastSeen:new V(),stuck:0,kind:def.id,alert:0,phase:'idle',timer:1+Math.random()*2,ringCount:0,trailIndex:0,held:0,teleportCount:0,warning:null,landing:null,anger:0,instruments:[]})}}}
+// Independent enemy-state simulation. Patch-5-inspired behaviours, not original Roblox AI.
+function nearestActiveTile(x,z){let best=null,dd=Infinity;for(const t of tiles){if(!t.active)continue;let d=(x-t.x*tileSize)**2+(z-t.z*tileSize)**2;if(d<dd){best=t;dd=d}}return best}
+function randomActiveTile(){const pool=tiles.filter(t=>t.active&&!t.hub);return pool[Math.floor(Math.random()*pool.length)]||tiles.find(t=>t.active)}
+// Bell hovers near the player rather than occupying a gift slot.
+// Keep a safe initial separation and avoid all active gift / mine positions.
+function placeBellNearPlayer(mesh){
+  const min=10,max=22;
+  let best=null,bestGap=-Infinity;
+  for(let attempt=0;attempt<36;attempt++){
+    const angle=Math.random()*Math.PI*2,dist=min+Math.random()*(max-min);
+    const x=p.x+Math.cos(angle)*dist,z=p.z+Math.sin(angle)*dist;
+    let separation=Infinity;
+    for(const gift of presents){if(!gift.found&&gift.tile.active)separation=Math.min(separation,Math.hypot(x-gift.group.position.x,z-gift.group.position.z))}
+    for(const mine of tripmines){if(mine.armed&&mine.tile.active)separation=Math.min(separation,Math.hypot(x-mine.mesh.position.x,z-mine.mesh.position.z))}
+    // Prefer locations away from tile centres and the gift track.
+    for(const tile of tiles){if(tile.active)separation=Math.min(separation,Math.hypot(x-tile.x*tileSize,z-tile.z*tileSize))}
+    if(separation>3.5){mesh.position.set(x,p.y+1.7,z);return}
+    if(separation>bestGap){bestGap=separation;best={x,z}}
+  }
+  if(best)mesh.position.set(best.x,p.y+1.7,best.z);
+}
+function teleportEnemy(m,allowNear=false){
+  if(m.kind==='bell'){placeBellNearPlayer(m.mesh);return}
+  const t=randomActiveTile();if(t)m.mesh.position.set(t.x*tileSize,t.y+1.7,t.z*tileSize);
+  if(!allowNear&&Math.hypot(m.mesh.position.x-p.x,m.mesh.position.z-p.z)<8){let a=Math.atan2(m.mesh.position.z-p.z,m.mesh.position.x-p.x);m.mesh.position.x=p.x+Math.cos(a)*13;m.mesh.position.z=p.z+Math.sin(a)*13}
+}
+function clearEnemyWarning(m){if(m.warning){world.remove(m.warning);m.warning.geometry?.dispose();m.warning.material?.dispose();m.warning=null}}
+function enemyWarning(m,x,z,r,color=0xff354f){clearEnemyWarning(m);m.warning=attackMarker(x,z,r,color);return m.warning}
+function setEnemyCue(kind, color, number, info){
+ const box=$('enemyCue');box.style.display=kind?'block':'none';if(!kind)return;
+ box.style.borderColor=color;box.style.boxShadow='0 0 34px '+color+'66, inset 0 0 22px '+color+'18';
+ box.style.background='linear-gradient(180deg,#170f22f4,#0b0912f0)';
+ $('cueTitle').textContent=kind;$('cueLamp').style.display=kind==='OPERATOR'?'block':'none';
+ $('cueLamp').style.background=color;$('cueLamp').style.color=color;$('cueLamp').style.boxShadow='0 0 34px '+color+', inset 0 0 18px #ffffff66';
+ $('cueNumber').textContent=number||'';$('cueNumber').style.color=color;$('cueInfo').textContent=info||'';
+}
+function operatorIsMoving(){
+ // Moving or using a sustained ability should prevent Operator from clearing.
+ return Math.hypot(vel.x,vel.z)>.9||Math.abs(vel.y)>1.25||dashTimer>0||chargeActive||gliding||hookActive||spiritActive;
+}
+let enemyThreatHudTick=0;
+function simulateMobs(dt){
+ let operatorUI=null,kolonaUI=null;
+ threatClock+=dt;abilityPulse=Math.max(0,abilityPulse-dt);enemyHintClock=Math.max(0,enemyHintClock-dt);
+ trailClock+=dt;if(trailClock>=.085){trailClock=0;playerTrail.push({x:p.x,z:p.z,y:p.y});if(playerTrail.length>650)playerTrail.shift()}
+ let closest=Infinity,closestName='';
+ for(const m of mobs){
+  const id=m.kind,pos=m.mesh.position,dx=p.x-pos.x,dz=p.z-pos.z,mag=Math.hypot(dx,dz)||.001,dirx=dx/mag,dirz=dz/mag;
+  m.cooldown-=dt;m.timer-=dt;m.drift+=dt;m.hitCooldown=Math.max(0,m.hitCooldown-dt);
+  const scale=difficulty==='casual'?.78:difficulty==='extreme'?1.25:1;
+  let speed=m.def.speed*scale;
+  if(mag<closest){closest=mag;closestName=m.def.name}
+  let contactDanger=true;
+  if(id==='mart'){
+   // Slowly, steadily follows player; can merge into a larger Mart.
+   pos.x+=dirx*speed*.72*dt;pos.z+=dirz*speed*.72*dt;
+   if(m.timer<0){m.timer=3.5;for(const other of mobs){if(other!==m&&other.kind==='mart'&&other.mesh.visible&&pos.distanceTo(other.mesh.position)<3.3){other.mesh.visible=false;other.phase='merged';m.mesh.scale.multiplyScalar(1.20);m.defSpeedScale=(m.defSpeedScale||1)*1.12}}}
+  }else if(id==='baby'||id==='voidbaby'){
+   // Stationary until it locks a straight-line dash: red lane warning, then sudden charge.
+   if(m.phase==='idle'&&m.cooldown<=0){m.phase='warn';m.timer=id==='voidbaby'?.38:.8;m.target.set(dirx,0,dirz);const x=pos.x+m.target.x*11,z=pos.z+m.target.z*11;enemyWarning(m,x,z,2.2,0xff3344);toast(m.def.name.toUpperCase()+' — DODGE THE LINE')}
+   if(m.phase==='warn'){contactDanger=false;if(m.timer<=0){m.phase='dash';m.timer=id==='voidbaby'?.58:.85;clearEnemyWarning(m)}}
+   else if(m.phase==='dash'){const v=(id==='voidbaby'?46:31)*dt;pos.x+=m.target.x*v;pos.z+=m.target.z*v;if(m.timer<=0){m.phase='idle';m.cooldown=id==='voidbaby'?2.6:4.0;teleportEnemy(m)}}
+   else contactDanger=false;
+  }else if(id==='bell'){
+   // Bell teleports periodically and launches the player; fourth ringing kills.
+   contactDanger=false;
+   if(m.timer<=0){teleportEnemy(m);m.timer=3.2+Math.random()*2.2;toast('BELL TELEPORTED')}
+   if(torsoSphereHit(pos.x,pos.y,pos.z,1.8)&&m.hitCooldown<=0){m.hitCooldown=2.3;m.ringCount++;vel.y=Math.max(vel.y,20);vel.x+=dirx*8;vel.z+=dirz*8;invulnerable=Math.max(invulnerable,.4);toast('BELL RUNG '+m.ringCount+'/4');if(m.ringCount>=4){invulnerable=0;hazardHit('Bell fourth ring')}else teleportEnemy(m)}
+  }else if(id==='husk'){
+   // Replay historical player positions, rather than steering directly at the player.
+   const delay=35;if(playerTrail.length>delay){const index=Math.max(0,playerTrail.length-delay-1);const point=playerTrail[index];pos.x+=(point.x-pos.x)*Math.min(1,dt*3.7);pos.z+=(point.z-pos.z)*Math.min(1,dt*3.7)}
+  }else if(id==='springer'){
+   contactDanger=false;
+   if(m.phase==='idle'&&m.timer<=0){const t=randomActiveTile();if(t){m.landing={x:t.x*tileSize,z:t.z*tileSize};m.phase='air';m.timer=1.05;enemyWarning(m,m.landing.x,m.landing.z,3.3);toast('SPRINGER — LANDING MARKED')}}
+   else if(m.phase==='air'){pos.y=2+Math.sin(Math.PI*(1-m.timer/1.05))*10;if(m.timer<=0){pos.x=m.landing.x;pos.z=m.landing.z;pos.y=1.7;clearEnemyWarning(m);threatBurst(pos.x,pos.z,4.6,.4,'Springer shockwave');if(torsoSphereHit(pos.x,1.7,pos.z,1.7))hazardHit('Springer landing');m.phase='idle';m.timer=3+Math.random()*2}}
+  }else if(id==='icbm'||id==='voidicbm'){
+   contactDanger=false;
+   // Follows target during acquisition, freezes its target, then strikes the fixed site.
+   if(m.phase==='idle'&&m.timer<=0){m.phase='tracking';m.timer=1.5;m.landing={x:p.x,z:p.z};enemyWarning(m,p.x,p.z,3.8);toast('ICBM LOCKING ON')}
+   else if(m.phase==='tracking'){m.landing.x=p.x;m.landing.z=p.z;pos.x+=(p.x-pos.x)*Math.min(1,dt*1.5);pos.z+=(p.z-pos.z)*Math.min(1,dt*1.5);if(m.warning)m.warning.position.set(p.x,.14,p.z);if(m.timer<=0){m.phase='fall';m.timer=.95;pos.y=17;toast('ICBM TARGET LOCKED — RUN!')}}
+   else if(m.phase==='fall'){pos.x=m.landing.x;pos.z=m.landing.z;pos.y=Math.max(1.7,1.7+m.timer*15);if(m.timer<=0){clearEnemyWarning(m);threatBurst(m.landing.x,m.landing.z,4.7,.12,m.def.name);if(id==='voidicbm'){for(let i=0;i<6;i++){const a=i*Math.PI/3;threatBurst(m.landing.x+Math.cos(a)*6,m.landing.z+Math.sin(a)*6,2.5,.3,m.def.name)}}m.phase='idle';m.timer=4.6;teleportEnemy(m)}}
+  }else if(id==='flesh'){
+   if(mag>3){pos.x+=dirx*speed*.75*dt;pos.z+=dirz*speed*.75*dt}
+   if(m.timer<=0){m.timer=2;const t=nearestActiveTile(pos.x,pos.z);if(t){infectedTiles.set(t,threatClock+13);t.group.scale.y=.94}}
+   const t=nearestActiveTile(p.x,p.z);if(t&&infectedTiles.has(t)){vel.x*=.92;vel.z*=.92;if(enemyHintClock<=0){toast('FLESH INFECTION — MOVEMENT SLOWED');enemyHintClock=3}}
+  }else if(id==='operator'){
+   contactDanger=false;
+   // Wiki: normally green; on encounter yellow on left HUD, red if moving for too long.
+   // No extra hit-area warning: failure itself is lethal after the stop-moving window.
+   if(m.phase==='idle'&&m.timer<=0){m.phase='warning';m.timer=difficulty==='extreme'?1.75:3;m.stillTime=0;toast('OPERATOR — STOP MOVING!')}
+   if(m.phase==='warning'){
+     const moving=operatorIsMoving();
+     m.stillTime=moving?0:(m.stillTime||0)+dt;
+     const nearlyFailed=m.timer<.85&&moving;
+     const color=nearlyFailed?0xff3449:0xffda45;
+     operatorUI={color,number:Math.max(0,m.timer).toFixed(1),info:moving?'RELEASE MOVEMENT + ABILITY':'HOLD STILL'};
+     if(m.mesh.userData.operatorLamp){const lamp=m.mesh.userData.operatorLamp.material;lamp.color.setHex(color);lamp.emissive.setHex(color)}
+     if(m.stillTime>=.25){m.phase='idle';m.timer=5.3;toast('OPERATOR — SAFE');}
+     else if(m.timer<=0){if(moving)hazardHit('Operator');m.phase='idle';m.timer=5.3;}
+   }else if(m.mesh.userData.operatorLamp){const lamp=m.mesh.userData.operatorLamp.material;lamp.color.setHex(0x5bdc91);lamp.emissive.setHex(0x5bdc91)}
+  }else if(id==='guardian'||id==='voidguardian'){
+   if(mag>12){pos.x+=dirx*speed*dt;pos.z+=dirz*speed*dt}
+   if(m.phase==='idle'&&m.cooldown<=0){m.phase='windup';m.timer=.95;toast('GUARDIAN — VOLLEY INCOMING')}
+   if(m.phase==='windup'&&m.timer<=0){const count=id==='voidguardian'?7:5;let angle=Math.atan2(dirz,dirx);for(let j=0;j<count;j++){let a=angle+(j-(count-1)/2)*.15;threatBolt(pos.x,pos.z,Math.cos(a),Math.sin(a),id==='voidguardian'?18:14,m.def.name,id==='voidguardian'?.85:.55)}m.cooldown=4.5;m.phase='idle'}
+  }else if(id==='telefragger'){
+   if(mag>13){pos.x+=dirx*speed*.65*dt;pos.z+=dirz*speed*.65*dt}
+   if(m.phase==='idle'&&m.cooldown<=0){m.phase='warn';m.timer=.75;const forward=new V(-Math.sin(yaw),0,-Math.cos(yaw));m.landing={x:p.x+forward.x*5.5,z:p.z+forward.z*5.5};enemyWarning(m,m.landing.x,m.landing.z,1.8,0xd16eff);toast('TELEFRAGGER — TELEPORT WARNING')}
+   if(m.phase==='warn'&&m.timer<=0){pos.x=m.landing.x;pos.z=m.landing.z;clearEnemyWarning(m);m.phase='idle';m.cooldown=6.5}
+  }else if(id==='kolona'){
+   contactDanger=false;
+   // Wiki: announce target, count 1 -> target, ability must be used on target.
+   if(m.phase==='idle'&&m.timer<=0&&activeClass!=='prisoner'){
+     m.phase='announce';m.timer=1.75;
+     m.targetCount=difficulty==='casual'?8+Math.floor(Math.random()*3):5+Math.floor(Math.random()*8);
+     m.countIndex=0;m.lastAbilitySerial=abilitySerial;m.success=false;
+     toast('KOLÓNA — REMEMBER '+m.targetCount);
+   }
+   if(m.phase==='announce'){
+      kolonaUI={color:'#ffc94f',number:String(m.targetCount),info:'MEMORIZE TARGET · USE [E] WHEN REACHED'};
+      if(m.timer<=0){m.phase='count';m.timer=.77;m.countIndex=1;m.lastAbilitySerial=abilitySerial}
+   }else if(m.phase==='count'){
+      kolonaUI={color:m.countIndex===m.targetCount?'#fff59a':'#ffaf4e',number:String(m.countIndex),info:'TARGET '+m.targetCount+' · PRESS E AT TARGET'};
+      if(m.mesh.userData.kolonaPillar)m.mesh.userData.kolonaPillar.rotation.y+=dt*1.6;
+      const abilityNow=abilitySerial!==m.lastAbilitySerial;
+      m.lastAbilitySerial=abilitySerial;
+      if(m.countIndex===m.targetCount&&abilityNow){m.phase='clear';m.timer=.6;toast('KOLÓNA — CLEARED!');kolonaUI={color:'#65ff84',number:'✓',info:'ABILITY TIMED CORRECTLY'}}
+      else if(m.timer<=0){if(m.countIndex>=m.targetCount){hazardHit('Kolóna');m.phase='idle';m.timer=6;}else{m.countIndex++;m.timer=.77;}}
+   }else if(m.phase==='clear'){
+      kolonaUI={color:'#65ff84',number:'✓',info:'SUCCESS'};
+      if(m.timer<=0){m.phase='idle';m.timer=6;}
+   }
+  }else if(id==='cadence'){
+   contactDanger=false;
+   if(m.timer<=0){m.timer=6;const t=randomActiveTile();if(t){const token=new THREE.Mesh(new THREE.OctahedronGeometry(.75),new THREE.MeshBasicMaterial({color:0xffb5e5}));token.position.set(t.x*tileSize,t.y+1.7,t.z*tileSize);world.add(token);m.instruments.push({mesh:token,tile:t});toast('CADENCE — COLLECT THE INSTRUMENTS')}}
+   for(let j=m.instruments.length-1;j>=0;j--){let item=m.instruments[j];if(Math.hypot(item.mesh.position.x-p.x,item.mesh.position.z-p.z)<2.3||!item.tile.active){world.remove(item.mesh);m.instruments.splice(j,1)}}
+   m.anger=Math.max(0,m.anger+dt*(m.instruments.length>=2?1.3:-1.5));if(m.anger>7){contactDanger=true;pos.x+=dirx*speed*4*dt;pos.z+=dirz*speed*4*dt;if(enemyHintClock<=0){toast('CADENCE ENRAGED!');enemyHintClock=3}}
+  }else if(id==='voidbreaker'){
+   contactDanger=false;if(m.cooldown<=0){let dx=Math.cos(yaw),dz=Math.sin(yaw);threatBurst(p.x+dx*4,p.z+dz*4,2,.8,'Voidbreaker sword');threatBurst(p.x-dx*4,p.z-dz*4,2,.8,'Voidbreaker sword');m.cooldown=4.2;toast('VOIDBREAKER — SWORDS!')}
+  }else if(id==='sigil'){
+   contactDanger=false;if(m.cooldown<=0){for(let k=0;k<4;k++)threatBurst(p.x+vel.x*(.18+k*.13),p.z+vel.z*(.18+k*.13),2.1,.7+k*.25,'Sigil beam');m.cooldown=5.2;toast('SIGIL — TRACKING BEAM')}
+  }else if(id==='scrapmaw'){
+   if(m.phase==='idle'&&m.cooldown<=0){m.phase='windup';m.timer=.75;m.target.set(dirx,0,dirz);enemyWarning(m,p.x,p.z,3,0xff9644);toast('SCRAPMAW — BLITZ!')}
+   if(m.phase==='windup'&&m.timer<=0){clearEnemyWarning(m);m.phase='dash';m.timer=.9}
+   if(m.phase==='dash'){pos.x+=m.target.x*42*dt;pos.z+=m.target.z*42*dt;if(m.timer<=0){m.phase='idle';m.cooldown=4.4}}
+  }else{if(mag>5){pos.x+=dirx*speed*dt;pos.z+=dirz*speed*dt}}
+  if(m.phase==='merged'){m.mesh.visible=false;continue}
+  if(id==='bell')pos.y=p.y+1.7+Math.sin(m.drift*2.1)*.12;else if(id!=='springer'||m.phase!=='air')pos.y=1.7+Math.sin(m.drift*2.1)*.12;
+  m.mesh.rotation.y=Math.atan2(-dirx,-dirz);
+  if(contactDanger&&torsoSphereHit(pos.x,pos.y,pos.z,id==='scrapmaw'?1.75:1.10)&&m.hitCooldown<=0){m.hitCooldown=1.5;hazardHit(m.def.name)}
+ }
+ for(const [t,until] of infectedTiles){if(!t.active||threatClock>until){infectedTiles.delete(t);t.group.scale.y=1}}
+ for(let i=attacks.length-1;i>=0;i--){const a=attacks[i];a.t+=dt;
+ if(a.type==='bolt'){a.x+=a.dx*a.speed*dt;a.z+=a.dz*a.speed*dt;a.mesh.position.set(a.x,1.3+Math.sin(a.t*9)*.2,a.z);a.mesh.rotation.y+=dt*7;if(torsoSphereHit(a.x,a.mesh.position.y,a.z,.62)){hazardHit(a.label);a.t=99}if(a.t>7){releaseAttack(a);attacks.splice(i,1)}}
+ else if(a.type==='burst'||a.type==='teleport'){const ratio=Math.min(1,a.t/a.delay);a.mesh.material.opacity=.2+.75*ratio;a.mesh.scale.setScalar(.8+.28*Math.sin(a.t*17)**2);if(a.t>=a.delay){if(torsoAreaHit(a.x,a.z,a.r))hazardHit(a.label);if(a.type==='teleport'&&a.source){a.source.mesh.position.set(a.x,1.7,a.z);a.source.cooldown=4}releaseAttack(a);attacks.splice(i,1)}}}
+ if(operatorUI)setEnemyCue('OPERATOR','#'+operatorUI.color.toString(16).padStart(6,'0'),operatorUI.number,operatorUI.info);else if(kolonaUI)setEnemyCue('KOLÓNA',kolonaUI.color,kolonaUI.number,kolonaUI.info);else setEnemyCue(null);
+ if((enemyThreatHudTick+=dt)>=.18){enemyThreatHudTick=0;$('threats').textContent=mobs.length?'THREATS '+mobs.length+' · NEAREST '+closestName.toUpperCase()+' '+Math.round(closest)+'m':'NO ACTIVE THREATS';}
+}
+let speedBonus=0,jumpBonus=0;
+// Gameplay hurtbox: only the torso can receive enemy contact/projectile damage.
+// Physical collider: a full-height vertical capsule, including head, arms and legs.
+const BODY_RADIUS=.84, BODY_HEIGHT=3.22, TORSO_BOTTOM=1.12, TORSO_TOP=2.25, TORSO_RADIUS=.46;
+function circleHitsRect(x,z,r,cx,cz,halfX,halfZ){const dx=x-Math.max(cx-halfX,Math.min(x,cx+halfX)),dz=z-Math.max(cz-halfZ,Math.min(z,cz+halfZ));return dx*dx+dz*dz<=r*r}
+function torsoSphereHit(x,y,z,r){const dy=y-Math.max(p.y+TORSO_BOTTOM,Math.min(y,p.y+TORSO_TOP));return (p.x-x)**2+(p.z-z)**2+dy*dy<=(r+TORSO_RADIUS)**2}
+function torsoAreaHit(x,z,r,y=1.5,thickness=2.4){return circleHitsRect(p.x,p.z,TORSO_RADIUS,x,z,r,r)&&p.y+TORSO_TOP>=y-thickness&&p.y+TORSO_BOTTOM<=y+thickness&&Math.hypot(p.x-x,p.z-z)<=r+TORSO_RADIUS}
+function solidsForCollision(){const all=[];for(const t of tiles)if(t.active)all.push({x:t.x*tileSize,z:t.z*tileSize,half:tileSize/2,top:t.y,bottom:t.y-tileThick});return all}
+// Thick track edges are actual vertical collision surfaces, not paper-thin floors.
+// Only resolve their sides while the player's feet are below the track top.
+// At normal track height, adjacent tiles remain seamless for walking.
+// Swept horizontal capsule vs. vertical track and pillar sides.
+// A swept test catches oblique and high-speed contacts even if collision
+// resolution moves the player out of the wall before a contact flag is read.
+function sweptGliderSideHit(fromX,fromY,fromZ,toX,toY,toZ){
+  const dx=toX-fromX,dz=toZ-fromZ;
+  if(dx*dx+dz*dz<1e-10)return false;
+  const sweep=(cx,cz,hx,hz,bottom,top)=>{
+    const minX=cx-hx-BODY_RADIUS,maxX=cx+hx+BODY_RADIUS;
+    const minZ=cz-hz-BODY_RADIUS,maxZ=cz+hz+BODY_RADIUS;
+    // The player must start outside this wall; being within a thick tile
+    // while walking on its upper surface must not count as a side impact.
+    if(fromX>minX&&fromX<maxX&&fromZ>minZ&&fromZ<maxZ)return false;
+    let enter=0,leave=1,nx=0,nz=0;
+    for(const [start,dir,lo,hi,ax,az] of [[fromX,dx,minX,maxX,1,0],[fromZ,dz,minZ,maxZ,0,1]]){
+      if(Math.abs(dir)<1e-9){if(start<lo||start>hi)return false;continue}
+      const near=(lo-start)/dir,far=(hi-start)/dir;
+      const entry=Math.min(near,far),exit=Math.max(near,far);
+      if(entry>enter){enter=entry;nx=dir>0?-ax:ax;nz=dir>0?-az:az}
+      leave=Math.min(leave,exit);
+      if(enter>leave)return false;
+    }
+    if(enter<0||enter>1||leave<0||(!nx&&!nz))return false;
+    const feet=fromY+(toY-fromY)*enter;
+    // Restrict detection to vertical side faces, not the platform top.
+    if(feet>=top-.06||feet+BODY_HEIGHT<=bottom+.04)return false;
+    return dx*nx+dz*nz<-.00001;
+  };
+  const lowX=Math.min(fromX,toX)-tileSize/2-BODY_RADIUS,highX=Math.max(fromX,toX)+tileSize/2+BODY_RADIUS;
+  const lowZ=Math.min(fromZ,toZ)-tileSize/2-BODY_RADIUS,highZ=Math.max(fromZ,toZ)+tileSize/2+BODY_RADIUS;
+  for(const t of tiles){
+    if(!t.active)continue;
+    const tx=t.x*tileSize,tz=t.z*tileSize;
+    if(tx<lowX||tx>highX||tz<lowZ||tz>highZ)continue;
+    if(sweep(tx,tz,tileSize/2,tileSize/2,t.y-tileThick,t.y))return true;
+  }
+  for(const o of routeObstacles){
+    if(o.tile.active&&sweep(o.x,o.z,o.halfX,o.halfZ,o.bottom,o.top))return true;
+  }
+  return false;
+}
+function resolveTrackSideCollision(previousX,previousZ){
+  
+  let hit=false;
+  for(let pass=0;pass<2;pass++)for(const t of tiles){
+    if(!t.active||p.y>=t.y-.06||p.y+BODY_HEIGHT<=t.y-tileThick)continue;
+    const cx=t.x*tileSize,cz=t.z*tileSize,half=tileSize/2;
+    if(Math.abs(p.x-cx)>half+BODY_RADIUS||Math.abs(p.z-cz)>half+BODY_RADIUS)continue;
+    if(!circleHitsRect(p.x,p.z,BODY_RADIUS,cx,cz,half,half))continue;
+    const nearestX=Math.max(cx-half,Math.min(p.x,cx+half));
+    const nearestZ=Math.max(cz-half,Math.min(p.z,cz+half));
+    let dx=p.x-nearestX,dz=p.z-nearestZ,dsq=dx*dx+dz*dz;
+    if(dsq>=BODY_RADIUS*BODY_RADIUS)continue;
+    let nx=0,nz=0,penetration=0;
+    if(dsq<1e-9){
+      const sides=[{d:p.x-(cx-half),nx:-1,nz:0},{d:(cx+half)-p.x,nx:1,nz:0},{d:p.z-(cz-half),nx:0,nz:-1},{d:(cz+half)-p.z,nx:0,nz:1}];
+      sides.sort((a,b)=>a.d-b.d);nx=sides[0].nx;nz=sides[0].nz;penetration=sides[0].d+BODY_RADIUS;
+    }else{const d=Math.sqrt(dsq);nx=dx/d;nz=dz/d;penetration=BODY_RADIUS-d;}
+    p.x+=nx*penetration;p.z+=nz*penetration;
+    const incoming=vel.x*nx+vel.z*nz;
+    if(incoming<0){vel.x-=incoming*nx;vel.z-=incoming*nz;hit=true;}
+  }
+  return hit;
+}
+function resolveObstacleCollision(previousX,previousY,previousZ){
+  let wallHit=false,contact=null;
+  for(let pass=0;pass<2;pass++)for(const o of routeObstacles){
+    if(!o.tile.active)continue;
+    if(p.y>=o.top || p.y+BODY_HEIGHT<=o.bottom)continue;
+    if(!circleHitsRect(p.x,p.z,BODY_RADIUS,o.x,o.z,o.halfX,o.halfZ))continue;
+    // Safe top-surface landing, e.g. when descending onto a tall pillar.
+    if(vel.y<=0&&previousY>=o.top-.12&&p.y<=o.top){
+      p.y=o.top;vel.y=0;grounded=true;contact=o;continue;
+    }
+    let nearestX=Math.max(o.x-o.halfX,Math.min(p.x,o.x+o.halfX));
+    let nearestZ=Math.max(o.z-o.halfZ,Math.min(p.z,o.z+o.halfZ));
+    let dx=p.x-nearestX,dz=p.z-nearestZ;
+    let dsq=dx*dx+dz*dz;
+    if(dsq>=BODY_RADIUS*BODY_RADIUS)continue;
+    let nx=0,nz=0,penetration=0;
+    if(dsq<1e-10){
+      let dl=p.x-(o.x-o.halfX),dr=(o.x+o.halfX)-p.x;
+      let db=p.z-(o.z-o.halfZ),df=(o.z+o.halfZ)-p.z;
+      const smallest=Math.min(dl,dr,db,df);
+      if(smallest===dl){nx=-1;penetration=dl+BODY_RADIUS}
+      else if(smallest===dr){nx=1;penetration=dr+BODY_RADIUS}
+      else if(smallest===db){nz=-1;penetration=db+BODY_RADIUS}
+      else {nz=1;penetration=df+BODY_RADIUS}
+    }else{
+      const d=Math.sqrt(dsq);nx=dx/d;nz=dz/d;penetration=BODY_RADIUS-d;
+    }
+    p.x+=nx*penetration;p.z+=nz*penetration;
+    const into=vel.x*nx+vel.z*nz;
+    if(into<0){vel.x-=into*nx;vel.z-=into*nz;wallHit=true;contact=o;}
+  }
+  return {wallHit,contact};
+}
+function resolvePlayerCollision(prevX,prevY,prevZ){
+  const bodies=solidsForCollision();let landed=null;const wasGrounded=grounded;grounded=false;
+  // Automatic stair traversal: stepping to an adjacent 0.9-unit-high tile is
+  // treated like walking up a shallow stair, rather than hitting its side.
+  // This happens only while walking on the ground, never during mid-air jumps.
+  if(wasGrounded&&vel.y<=0.1){
+    let stepTop=-Infinity;
+    for(const b of bodies){
+      if(!circleHitsRect(p.x,p.z,BODY_RADIUS*.65,b.x,b.z,b.half-.1,b.half-.1))continue;
+      const rise=b.top-prevY;
+      if(rise>0.015&&rise<=1.04&&b.top>stepTop)stepTop=b.top;
+    }
+    if(stepTop>-Infinity){p.y=stepTop;vel.y=0;grounded=true;landed={top:stepTop};}
+  }
+  // Resolve vertical contacts using a crossing test, avoiding landing on the underside.
+  for(const b of bodies){if(!circleHitsRect(p.x,p.z,BODY_RADIUS,b.x,b.z,b.half,b.half))continue;
+    if(vel.y<=0&&prevY>=b.top-.09&&p.y<=b.top){p.y=Math.max(p.y,b.top);vel.y=0;landed=b;grounded=true;}
+    else if(vel.y>0&&prevY+BODY_HEIGHT<=b.bottom+.04&&p.y+BODY_HEIGHT>=b.bottom){p.y=b.bottom-BODY_HEIGHT;vel.y=0;}
+  }
+  // Block the whole body against the vertical sides of raised platforms.
+  // Ordinary tiles are walkable at feet Y=0, but cannot be entered from their side below them.
+  for(let pass=0;pass<2;pass++)for(const b of bodies){if(p.y>=b.top-.04||p.y+BODY_HEIGHT<=b.bottom+.04)continue;
+    let closestX=Math.max(b.x-b.half,Math.min(p.x,b.x+b.half));let closestZ=Math.max(b.z-b.half,Math.min(p.z,b.z+b.half));let dx=p.x-closestX,dz=p.z-closestZ,dsq=dx*dx+dz*dz;
+    if(dsq>=BODY_RADIUS*BODY_RADIUS)continue;
+    if(dsq<1e-8){const left=Math.abs(p.x-(b.x-b.half)),right=Math.abs((b.x+b.half)-p.x),back=Math.abs(p.z-(b.z-b.half)),front=Math.abs((b.z+b.half)-p.z);const nearest=Math.min(left,right,back,front);if(nearest===left){p.x=b.x-b.half-BODY_RADIUS;vel.x=Math.min(vel.x,0)}else if(nearest===right){p.x=b.x+b.half+BODY_RADIUS;vel.x=Math.max(vel.x,0)}else if(nearest===back){p.z=b.z-b.half-BODY_RADIUS;vel.z=Math.min(vel.z,0)}else{p.z=b.z+b.half+BODY_RADIUS;vel.z=Math.max(vel.z,0)}}
+    else {const d=Math.sqrt(dsq),nx=dx/d,nz=dz/d,penetration=BODY_RADIUS-d;p.x+=nx*penetration;p.z+=nz*penetration;const into=vel.x*nx+vel.z*nz;if(into<0){vel.x-=into*nx;vel.z-=into*nz}}
+  }
+  if(landed){jumpsUsed=0;diveAvailable=true;diveJumpCredit=false;glideBonked=false;return landed}
+  return null;
+}
+
+// Patch 5 class movement approximation: continuous input, independent ability states.
+let grappleCarry=0,diveActive=false,diveCooldown=0,diveAvailable=true,diveRecovery=0,diveJumpCredit=false,chargeActive=false,chargeRecovery=0,spiritActive=false,spiritBody=new V(),spiritRemaining=0,spiritShield=false,spiritFling=false,spiritCooldown=0,spiritGhostJump=0;
+const spiritStatue=new THREE.Group();const statueMaterial=new THREE.MeshStandardMaterial({color:0xb1b8c9,emissive:0x5750c5,emissiveIntensity:.36,roughness:.6});box(spiritStatue,1.05,1.42,.7,statueMaterial,0,1.7,0);box(spiritStatue,.77,.8,.72,statueMaterial,0,2.79,0);for(const sx of [-.31,.31])box(spiritStatue,.33,1.1,.47,statueMaterial,sx,.61,0);spiritStatue.visible=false;scene.add(spiritStatue);
+const spiritOutline=new THREE.Mesh(new THREE.BoxGeometry(1.45,3.45,1.15),new THREE.MeshBasicMaterial({color:0xf8f8ff,transparent:true,opacity:.23,wireframe:true,depthWrite:false}));spiritOutline.position.y=1.6;spiritOutline.visible=false;hero.add(spiritOutline);
+let hookTarget=null,hookLine=null,hookAiming=false,hookActive=false,hookLength=0,hookReelCooldown=0,hookKind='platform',hookPad=null,chargeDrop=false,glideMomentum=0,glideFlightSpeed=0,glideBonkCooldown=0,glideBoostCooldown=0,glideBonked=false;
+const hookLineMat=new THREE.LineBasicMaterial({color:0xb8d7ff,transparent:true,opacity:.83});
+function abilityDirection(){const f=new V(-Math.sin(yaw),0,-Math.cos(yaw)),r=new V(Math.cos(yaw),0,-Math.sin(yaw));let x=(keys.KeyD?1:0)-(keys.KeyA?1:0),z=(keys.KeyW?1:0)-(keys.KeyS?1:0);const d=r.multiplyScalar(x).addScaledVector(f,z);if(d.lengthSq()<.05)d.set(-Math.sin(yaw),0,-Math.cos(yaw));return d.normalize()}
+const GRAPPLE_MAX_RANGE=34; // prototype tuning: roughly four tiles, not across the map
+const grappleRaycaster=new THREE.Raycaster();
+const grappleAimDir=new V();
+function grappleCandidates(){
+  const objects=[];
+  for(const t of tiles)if(t.active)t.group.traverse(o=>{if(o.isMesh)objects.push(o)});
+  for(const j of jumpPads)if(j.tile.active)j.mesh.traverse(o=>{if(o.isMesh)objects.push(o)});
+  return objects;
+}
+function findGrappleTarget(){
+  // A ray from the CAMERA through the reticle, not from the torso: prevents
+  // a near-ground ray from striking the player's own platform immediately.
+  camera.updateMatrixWorld(true);
+  grappleRaycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+  grappleRaycaster.far=GRAPPLE_MAX_RANGE+15;
+  const origin=p.clone().add(new V(0,1.65,0));
+  const hits=grappleRaycaster.intersectObjects(grappleCandidates(),false);
+  for(const hit of hits){
+    if(hit.point.distanceTo(origin)>GRAPPLE_MAX_RANGE||hit.point.distanceTo(origin)<1.1)continue;
+    let pad=null;
+    for(const j of jumpPads)if(j.tile.active&&j.mesh.position.distanceTo(hit.point)<2.6)pad=j;
+    if(pad&&pad.uses>=2)continue;
+    return {point:hit.point.clone(),kind:pad?'pad':'platform',pad};
+  }
+  // Mild crosshair assist picks a close-to-reticle pad or tile surface.
+  const v=new V();let best=null,bestScore=.955;
+  const consider=(point,kind,pad=null)=>{
+    const delta=point.clone().sub(camera.position),distance=delta.length();
+    if(distance>GRAPPLE_MAX_RANGE+15||distance<3)return;
+    delta.normalize();
+    const score=delta.dot(grappleRaycaster.ray.direction)-distance*.00020;
+    if(score>bestScore&&point.distanceTo(origin)<=GRAPPLE_MAX_RANGE){best={point:point.clone(),kind,pad};bestScore=score}
+  };
+  for(const j of jumpPads)if(j.tile.active&&j.uses<2)consider(j.mesh.position.clone().add(new V(0,.25,0)),'pad',j);
+  for(const t of tiles)if(t.active)consider(new V(t.x*tileSize,t.y,t.z*tileSize),'platform');
+  return best;
+}
+function releaseGrapple(launch=false){
+  if(!hookActive)return;
+  grappleCarry=launch?.68:0;
+  if(launch&&hookKind==='platform'&&hookTarget){
+    // Preserve tangential velocity instead of resetting it when the tether releases.
+    // A short impulse rewards releasing near the bottom of a fast swing.
+    const radial=p.clone().add(new V(0,1.65,0)).sub(hookTarget).normalize();
+    const tangent=vel.clone().addScaledVector(radial,-vel.dot(radial));
+    const tangentSpeed=tangent.length();
+    if(tangentSpeed>2.5){
+      const extra=Math.min(15,4+tangentSpeed*.20);
+      tangent.normalize();tangent.y*=.82;vel.addScaledVector(tangent,extra);
+    }
+    // Small hop to help clear the lip of the platform, without supplying a full jump.
+    vel.y=Math.max(vel.y,2.5);
+    vel.clampLength(0,68);
+  }
+  stopHook();
+}
+function stopHook(){hookActive=false;hookAiming=false;hookTarget=null;hookPad=null;hookKind='platform';hookLength=0;if(hookLine){scene.remove(hookLine);hookLine.geometry.dispose();hookLine=null}$('grappleStatus').style.display='none'}
+function updateGrappleRope(){
+ if(!hookActive||!hookTarget)return;
+ if(!hookLine){const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3).setUsage(THREE.DynamicDrawUsage));hookLine=new THREE.Line(geometry,hookLineMat);hookLine.frustumCulled=false;scene.add(hookLine)}
+ const attr=hookLine.geometry.attributes.position;
+ attr.setXYZ(0,p.x,p.y+1.65,p.z);attr.setXYZ(1,hookTarget.x,hookTarget.y,hookTarget.z);attr.needsUpdate=true;
+}
+function endSpirit(fling=false){
+ if(!spiritActive)return;
+ const ghostPos=p.clone(),bodyPos=spiritBody.clone();
+ spiritActive=false;spiritShield=false;spiritFling=false;
+ hero.scale.setScalar(1);spiritOutline.visible=false;spiritStatue.visible=false;
+ p.copy(bodyPos);vel.set(0,0,0);
+ if(fling){
+  const away=ghostPos.sub(bodyPos);const distance=away.length();
+  if(distance>.1){away.normalize();const power=Math.min(58,19+distance*.58);vel.copy(away.multiplyScalar(-power));vel.y=Math.max(9,vel.y+7)}
+  toast('SPIRIT FLING');
+ }else toast('SPIRIT RETURN');
+ dashCharge=Math.max(0,dashCharge-.07);spiritCooldown=.65;
+ invulnerable=Math.max(invulnerable,.75);grounded=false;
+}
+function startSpirit(fling=false){
+ if(spiritActive||spiritCooldown>0||dashCharge<.18){toast('SPIRIT RECHARGING');return}
+ if(!grounded&&!owned.includes('sharktail')){toast('SPIRIT NEEDS SOLID GROUND');return}
+ spiritActive=true;spiritFling=fling;spiritShield=true;
+ spiritBody.copy(p);spiritStatue.position.copy(p);spiritStatue.visible=true;
+ spiritRemaining=10+(owned.includes('ninjabelt')?10:0);
+ spiritOutline.visible=true;hero.scale.setScalar(.9);
+ toast(fling?'SPIRIT FLING MODE — E TO LAUNCH':'SPIRIT FORM — E TO RETURN');
+}
+function beginAbility(){if(!started||paused||dead)return;if(activeClass!=='prisoner')abilitySerial++;abilityPulse=2.8;
+if(activeClass==='prisoner'){toast('PRISONER — NO ACTIVE ABILITY');return}
+if(activeClass==='wanted'){vel.set(0,0,0);dashTimer=0;toast('MOMENTUM CANCELLED');return}
+if(activeClass==='diver'){
+  if(diveActive||!diveAvailable||diveCooldown>0){toast('DIVE REQUIRES LANDING');return}
+  diveJumpCredit=grounded&&jumpsUsed===0;diveActive=true;diveAvailable=false;diveRecovery=0;
+  dashDir.copy(abilityDirection());dashTimer=.52;diveCooldown=.25;
+  vel.x=dashDir.x*48;vel.z=dashDir.z*48;
+  vel.y=Math.max(vel.y,grounded?2.5:-1.5);
+  toast('FORWARD DIVE — ONE PER AIRTIME');return
+}
+if(activeClass==='charger'){if(chargeRecovery>0||dashCharge<.08){toast('CHARGE RECHARGING');return}chargeActive=true;dashDir.copy(abilityDirection());if(!grounded){chargeDrop=true;vel.y=Math.min(vel.y,-17)}return}
+if(activeClass==='glider'){
+ if(dashCharge<=.025){toast('GLIDER STAMINA EMPTY');return}
+ if(glideBonked&&!owned.includes('helmet')){toast('BONKED — LAND BEFORE GLIDING AGAIN (HELMET TO RECOVER)');return}
+ // Helmet lets flight resume immediately after a wall bonk.
+ glideBonked=false;gliding=true;
+ // Preserve launch-pad and running momentum when deployment begins.
+ glideFlightSpeed=Math.max(19,Math.min(54,Math.hypot(vel.x,vel.z)*1.1));
+ glideWings.visible=true;
+ return
+}
+if(activeClass==='grappler'){if(hookActive){releaseGrapple(true);toast('GRAPPLE RELEASED — MOMENTUM KEPT');return}if(dashCharge<.08){toast('NOT ENOUGH GRAPPLE STAMINA');return}hookAiming=true;return}
+if(activeClass==='spirit'){if(spiritActive){endSpirit(spiritFling);return}startSpirit(false);return}
+}
+function releaseAbility(){
+  if(activeClass==='charger'&&chargeActive){chargeActive=false;chargeDrop=false;chargeRecovery=2;toast('CHARGE COOLDOWN')}
+  if(activeClass==='glider'){gliding=false;glideWings.visible=false;}
+  if(activeClass==='grappler'&&hookAiming){
+    hookAiming=false;
+    if(dashCharge<.08)return;
+    const target=findGrappleTarget();
+    if(target){
+      hookTarget=target.point;hookKind=target.kind;hookPad=target.pad;
+      const gap=p.clone().add(new V(0,1.65,0)).distanceTo(hookTarget);
+      hookLength=Math.max(3.1,gap*.89);hookActive=true;hookReelCooldown=0;
+      if(hookPad){hookPad.uses++;hookPad.circle.material.color.setHex(hookPad.uses>=2?0xff4767:0xff8ad3)}
+      if(grounded){vel.y=Math.max(vel.y,6);grounded=false}
+      toast(hookKind==='pad'?'HOOKED BLUE PAD — REELING':'HOOKED PLATFORM — SWING');
+      updateGrappleRope()
+    }
+    else toast('NO GRAPPLE SURFACE IN CROSSHAIR');
+  }
+  $('grappleStatus').style.display='none';
+}
+function altAbility(){if(!started||paused)return;if(activeClass==='charger'&&chargeActive){chargeDrop=false;vel.y=Math.max(vel.y,2);return}if(activeClass==='spirit'){if(!spiritActive)startSpirit(true);else if(owned.includes('ninjabelt')){spiritBody.copy(p);spiritStatue.position.copy(p);spiritFling=false;toast('SPIRIT BODY TELEPORTED')}else{spiritFling=true;toast('SPIRIT FLING ARMED — E TO RETURN')}}if(activeClass==='grappler'&&hookActive&&hookReelCooldown<=0&&dashCharge>.07){hookLength=Math.max(3,hookLength-8);vel.addScaledVector(hookTarget.clone().sub(p).normalize(),15);dashCharge=Math.max(0,dashCharge-.07);hookReelCooldown=2;toast('GRAPPLE REEL')}if(activeClass==='glider'&&gliding&&owned.includes('sharktail'))toast('SHARK TAIL — HOLD Q WHILE GLIDING')}
+let hudUpdateElapsed=0,collapseHudElapsed=0;
+function simulate(dt){if(dead||transition)return;
+diveCooldown=Math.max(0,diveCooldown-dt);chargeRecovery=Math.max(0,chargeRecovery-dt);hookReelCooldown=Math.max(0,hookReelCooldown-dt);spiritCooldown=Math.max(0,spiritCooldown-dt);
+const recharge=activeClass==='diver'||activeClass==='wanted'||activeClass==='prisoner'?1:(activeClass==='charger'?.52:(activeClass==='spirit'?.13:.115+dashRate));
+if(activeClass==='charger'&&chargeActive){dashCharge=Math.max(0,dashCharge-dt*.31);if(dashCharge<=0){chargeActive=false;chargeDrop=false;chargeRecovery=2;toast('CHARGE DEPLETED')}}
+else if(!spiritActive&&!hookActive&&!gliding&&(activeClass!=='charger'||chargeRecovery<=0))dashCharge=Math.min(1,dashCharge+dt*recharge*(activeClass==='glider'?1+got/Math.max(1,total):1));
+if(activeClass==='diver')dashCharge=diveAvailable?1:0;
+if(activeClass==='grappler'&&hookAiming){const target=findGrappleTarget();const status=$('grappleStatus');status.style.display='block';status.textContent=target?'HOOK '+target.kind.toUpperCase()+' · '+Math.round(target.point.distanceTo(p))+'m':'AIM AT A PLATFORM / BLUE PAD (34m MAX)';status.style.borderColor=target?'#6ad7ff99':'#ff789488';}
+
+invulnerable=Math.max(0,invulnerable-dt);
+let f=new V(-Math.sin(yaw),0,-Math.cos(yaw)),r=new V(Math.cos(yaw),0,-Math.sin(yaw));
+let ix=(keys.KeyD?1:0)-(keys.KeyA?1:0),iz=(keys.KeyW?1:0)-(keys.KeyS?1:0);
+let desire=new V().addScaledVector(r,ix).addScaledVector(f,iz);if(desire.lengthSq()>1)desire.normalize();
+let speed=(keys.ControlLeft||keys.ControlRight?17.5:12.6)*(activeClass==='wanted'?1.1:activeClass==='prisoner'?1.07:activeClass==='glider'?.96:1)*(1+speedBonus)*(greaterCurses.includes('malfunction')?.85:1);
+if(spiritActive){
+ const separation=p.distanceTo(spiritBody);
+ spiritRemaining-=dt;
+ dashCharge=Math.max(0,dashCharge-dt*(.075+(spiritFling? .045+separation*.0018:0)));
+ speed*=1.45;
+ // The original body remains where Spirit was activated. It is not an extra life
+ // if its supporting platform disappears or it falls into the void.
+ const bodySupported=tiles.some(t=>t.active&&Math.abs(spiritBody.x-t.x*tileSize)<tileSize/2+.4&&Math.abs(spiritBody.z-t.z*tileSize)<tileSize/2+.4&&Math.abs(spiritBody.y-t.y)<1.15);
+ if(!bodySupported){spiritBody.y-=dt*26;spiritStatue.position.copy(spiritBody)}
+ if(spiritBody.y< -36){spiritActive=false;spiritStatue.visible=false;spiritOutline.visible=false;instantKill('Spirit body lost');return}
+ if(spiritRemaining<=0||dashCharge<=0)endSpirit(false)
+}
+let horizontal=new V(vel.x,0,vel.z),target=desire.clone().multiplyScalar(speed);
+const iceUnder=iceLevel&&tiles.some(t=>t.icy&&t.active&&Math.abs(p.x-t.x*tileSize)<tileSize/2&&Math.abs(p.z-t.z*tileSize)<tileSize/2);
+const steer=gliding&&activeClass==='glider'?.018:hookActive?.045:grappleCarry>0?.12:diveActive?.35:diveRecovery>0?.85:1;
+horizontal.lerp(target,Math.min(1,dt*(grounded?(iceUnder?1.5:13):5.3+airBonus*15)*steer));
+vel.x=horizontal.x;vel.z=horizontal.z;
+grappleCarry=Math.max(0,grappleCarry-dt);diveRecovery=Math.max(0,diveRecovery-dt);if(!diveActive)diveJumpCredit=false;
+if(diveActive){
+  dashTimer-=dt;
+  vel.x=dashDir.x*48;vel.z=dashDir.z*48;
+  vel.y=Math.max(vel.y,-4);
+  if(dashTimer<=0){diveActive=false;diveRecovery=.38;dashTimer=0}
+}else if(diveRecovery>0){
+  // Keep horizontal velocity through the dive exit, instead of instantly
+  // reducing it to normal walking speed.
+  const carry=vel.clone().setY(0);
+  if(carry.length()>20){const f=Math.max(.86,1-dt*1.8);vel.x*=f;vel.z*=f}
+}
+if(chargeActive){if(grounded){vel.x=dashDir.x*36;vel.z=dashDir.z*36;vel.y=Math.max(-2,vel.y)}else if(chargeDrop){vel.y=Math.min(vel.y,-18)}}
+if(activeClass==='glider'&&gliding&&dashCharge>0){
+  // Camera-driven soaring: pitch down to accelerate, pull back up to convert
+  // the resulting forward velocity into altitude. The W key is not required.
+  const heading=new V(-Math.sin(yaw),0,-Math.cos(yaw));
+  const strafe=new V(Math.cos(yaw),0,-Math.sin(yaw));
+  const diveAngle=THREE.MathUtils.clamp(pitch,-1.3,1.25);
+  const downward=Math.max(0,Math.sin(diveAngle));
+  const climbing=Math.max(0,-Math.sin(diveAngle));
+  const sharkTail=owned.includes('sharktail')&&keys.KeyQ;
+  const speedScale=1+speedBonus*.40;
+  const speedGoal=THREE.MathUtils.clamp(21+downward*33+(sharkTail?29:0),18,75)*speedScale;
+  // Momentum decays gradually when pulling up instead of being overwritten.
+  const acceleration=downward>0?16:(sharkTail?14:4.5);
+  glideFlightSpeed+=(speedGoal-glideFlightSpeed)*Math.min(1,dt*acceleration/Math.max(12,glideFlightSpeed));
+  glideFlightSpeed=THREE.MathUtils.clamp(glideFlightSpeed,13,sharkTail?84:69);
+  let sideInput=(keys.KeyD?1:0)-(keys.KeyA?1:0);
+  const currentDir=new V(vel.x,0,vel.z);
+  if(currentDir.lengthSq()<.001)currentDir.copy(heading);
+  currentDir.normalize();
+  const desiredDir=heading.addScaledVector(strafe,sideInput*.46).normalize();
+  currentDir.lerp(desiredDir,Math.min(1,dt*5)).normalize();
+  vel.x=currentDir.x*glideFlightSpeed;
+  vel.z=currentDir.z*glideFlightSpeed;
+  // A well-timed pull-up gains altitude only when sufficient speed was built.
+  // These are deliberately independent prototype physics, not verified Roblox values.
+  const lift=climbing*Math.max(0,glideFlightSpeed-17)*.42;
+  const descent=2.0+downward*glideFlightSpeed*.56;
+  const targetY=THREE.MathUtils.clamp(lift-descent,-38,13);
+  vel.y+=(targetY-vel.y)*Math.min(1,dt*4.8);
+  dashCharge=Math.max(0,dashCharge-dt*(sharkTail?.34:.125));
+  glideWings.visible=true;
+  if(dashCharge<=0){gliding=false;glideWings.visible=false;toast('GLIDER STAMINA EMPTY')}
+}else if(activeClass==='glider'){
+  glideFlightSpeed=Math.max(0,glideFlightSpeed-dt*8);
+  glideWings.visible=false;
+}
+if(activeClass==='grappler'&&hookActive&&hookTarget){
+  dashCharge=Math.max(0,dashCharge-dt*.15);
+  if(dashCharge<=0){stopHook();toast('GRAPPLE STAMINA EMPTY')}
+  else {
+    const shoulder=p.clone().add(new V(0,1.65,0));
+    const toward=hookTarget.clone().sub(shoulder);
+    const len=toward.length();
+    if(len>.1){
+      toward.normalize();
+      if(hookKind==='pad'){
+        // Jump pads reel the player into the square instead of swinging.
+        vel.addScaledVector(toward,dt*105);
+        vel.clampLength(0,48);
+        if(len<3){vel.y=Math.max(vel.y,19.5);stopHook();toast('PAD REEL BOOST')}
+      }else{
+        // Pump the swing tangentially with WASD. Pulling directly toward the
+        // anchor bleeds speed, so project movement input onto the rope plane.
+        const tangentInput=desire.clone().addScaledVector(toward,-desire.dot(toward));
+        if(tangentInput.lengthSq()>.0001){
+          tangentInput.normalize();
+          vel.addScaledVector(tangentInput,dt*37);
+        }
+        // A taut rope adds centripetal acceleration, not continuous magnetic drag.
+        // The positional rope constraint below removes outward radial velocity.
+        if(len>hookLength-.3){
+          vel.addScaledVector(toward,dt*(18+Math.max(0,len-hookLength)*55));
+        }
+        // Avoid uncontrolled numerical speed spikes but allow strong swings.
+        vel.clampLength(0,64);
+      }
+    }
+    updateGrappleRope();
+  }
+}
+if(!(activeClass==='glider'&&gliding))vel.y-=(chosenCurses.includes('lowergravity')?20:31)*dt;
+if(grounded&&activeClass!=='glider')gliding=false;padPreviousPosition.copy(p);let wasY=p.y;p.x+=vel.x*dt;p.z+=vel.z*dt;p.y+=vel.y*dt;runDistance+=Math.hypot(vel.x,vel.z)*dt;
+// Character feet collide against the top surface of every active checkerboard platform.
+const priorX=p.x,priorZ=p.z,priorY=p.y;
+const priorHorizontalSpeed=Math.hypot(vel.x,vel.z);
+const gliderWasFlying=activeClass==='glider'&&gliding;
+const sweptWallHit=gliderWasFlying&&glideBonkCooldown<=0&&sweptGliderSideHit(padPreviousPosition.x,wasY,padPreviousPosition.z,priorX,priorY,priorZ);
+const collisionContact=resolvePlayerCollision(padPreviousPosition.x,wasY,padPreviousPosition.z);
+const trackSideHit=resolveTrackSideCollision(p.x-vel.x*dt,p.z-vel.z*dt);
+const obstacleContact=resolveObstacleCollision(p.x-vel.x*dt,wasY,p.z-vel.z*dt);
+if(gliderWasFlying&&glideBonkCooldown<=0){
+  const wallHit=sweptWallHit||trackSideHit||obstacleContact.wallHit||Math.hypot(priorX-p.x,priorZ-p.z)>.13;
+  const touchdown=!!collisionContact;
+  // Every actual vertical wall collision during Glider flight triggers a full bonk,
+  // regardless of incoming speed. Floor touchdowns end flight without a bonk.
+  if(wallHit){
+    vel.y=VERTICAL_LAUNCH_SPEED;
+    grounded=false;
+    glideBonkCooldown=.55;
+    glideBonked=true;
+    glideFlightSpeed=Math.max(13,glideFlightSpeed*.70);
+    gliding=false;glideWings.visible=false;
+    toast(owned.includes('helmet')?'GLIDER BONK — HELMET: PRESS E TO RESUME':'GLIDER BONK — LAND TO RESUME GLIDING');
+  }else if(touchdown){gliding=false;glideWings.visible=false;glideFlightSpeed=0;glideBonked=false}
+}
+glideBonkCooldown=Math.max(0,glideBonkCooldown-dt);
+// Grappling ends when solid ground catches the feet; jump-pad trigger contacts also detach the hook.
+// Do not reset velocity: landing is handled by the ordinary ground collider.
+if(activeClass==='grappler'&&hookActive&&grounded){stopHook();toast('GRAPPLE RELEASED — GROUND CONTACT')}
+if(hookActive&&hookTarget&&hookKind==='platform'){const torso=p.clone().add(new V(0,1.6,0)),delta=torso.sub(hookTarget),radius=delta.length();if(radius>hookLength&&radius>0.001){delta.multiplyScalar(1/radius);p.addScaledVector(delta,hookLength-radius);const radial=vel.dot(delta);if(radial>0)vel.addScaledVector(delta,-radial);updateGrappleRope()}}
+if(p.y< -36){lose();return}hero.position.copy(p);if(desire.lengthSq()>.05){let a=Math.atan2(-desire.x,-desire.z);hero.rotation.y+=( (a-hero.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*12)}
+for(let t of presents){if(t.found||!t.tile.active)continue;let ox=p.x-t.group.position.x,oz=p.z-t.group.position.z;if(Math.abs(ox)<44&&Math.abs(oz)<44){t.group.rotation.y+=dt*1.2;t.group.position.y=t.baseY+Math.sin(performance.now()*.003+t.phase)*.21;}if(ox*ox+oz*oz<(3.3+pickupBonus+(spiritActive?Math.min(8,p.distanceTo(spiritBody)*.10):0)+(activeClass==='glider'&&gliding&&owned.includes('sharktail')&&keys.KeyQ?3:0))**2&&Math.abs((p.y+1.55)-(t.group.position.y+.85))<3.15){t.found=true;t.group.visible=false;if(t.golden){gold++;runGoldCollected++;roundGoldCollected++;if(activeClass!=='charger')dashCharge=Math.min(1,dashCharge+.22)}else {got++;if(['grappler','glider'].includes(activeClass))dashCharge=Math.min(1,dashCharge+.12)}updateHud()}}
+if(phase==='collect'&&got>=total)startCollapse();if(phase==='collapse'){collapseTime+=dt;collapseHudElapsed+=dt;if(collapseHudElapsed>.18){collapseHudElapsed=0;$('collapsepct').textContent=Math.round(100*tiles.reduce((count,t)=>count+(!t.hub&&!t.active?1:0),0)/Math.max(1,tiles.length-9))+'%';}for(let t of tiles)if(!t.hub&&t.active){let timeout=t.collapseAt;if(collapseTime>timeout){collapseFragments(t);t.active=false;t.group.visible=false;for(const g of presents)if(g.tile===t)g.group.visible=false}else if(collapseTime>timeout-3.35){updateFractures(t,timeout-collapseTime,dt);}}
+const beaconRadius=Math.hypot(p.x,p.z);const beaconTopY=92;const beaconBottomY=-2.5;if(beaconRadius<2.35&&p.y>beaconBottomY&&p.y<beaconTopY){roundEnd()}}
+simulateMobs(dt);updateAltars(dt);updateChallengeTiles(dt);if((hudUpdateElapsed+=dt)>=.12){hudUpdateElapsed=0;updateGuide();$('runInfo').textContent='DISTANCE '+Math.round(runDistance)+'m · GOLD COLLECTED '+runGoldCollected+' · PADS '+jumpPads.length+' · MINES '+tripmines.filter(t=>t.armed).length+' · HEIGHT '+Math.round(p.y)+'m';}$('fill').style.width=(dashCharge*100)+'%';$('dashstate').textContent=activeClass==='prisoner'?'NO ABILITY':activeClass==='wanted'?'MOMENTUM STOP':diveActive?'DIVING':!diveAvailable?'LAND TO DIVE':chargeActive?'CHARGING':chargeRecovery>0?'CHARGE '+chargeRecovery.toFixed(1)+'s':hookAiming?'AIMING':hookActive?'GRAPPLING':spiritActive?'SPIRIT':gliding?'GLIDING '+Math.round(glideFlightSpeed)+' SPEED':glideBonked&&!owned.includes('helmet')?'BONKED — LAND':glideBonked?'HELMET — E TO GLIDE':dashCharge>=1?'READY':'RECHARGING';}
+let dashDir=new V();
+addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.repeat)return;keys[e.code]=true;
+if(e.code==='ShiftLeft'||e.code==='ShiftRight'){shiftLock=!shiftLock;toast('SHIFT LOCK '+(shiftLock?'ON':'OFF'))}
+if(e.code==='KeyE')beginAbility();if(e.code==='KeyQ')altAbility();if(e.code==='KeyF')interactAltar();if(e.code==='KeyH')showGuide();
+if(e.code==='KeyT'&&started&&!paused){const groups=[['mart','baby','bell','husk'],['springer','icbm','operator','guardian'],['telefragger','kolona','flesh','voidbreaker'],['cadence','sigil','scrapmaw','voidbaby']];testGroupIndex=(testGroupIndex+1)%groups.length;chosenEnemies=groups[testGroupIndex].slice();rebuildMobs();toast('TEST GROUP '+(testGroupIndex+1)+' — '+chosenEnemies.map(x=>x.toUpperCase()).join(', '));}
+if(e.code==='Space'&&started&&!paused){if(diveActive){
+   diveActive=false;dashTimer=0;diveRecovery=.42;
+   // Do not grant a new jump: a dive never resets or increases jumpsUsed.
+   const canJump=grounded||diveJumpCredit||jumpsUsed<extraJumps+(activeClass==='wanted'?2:0);
+   if(canJump){vel.y=12.9*(1+jumpBonus);jumpsUsed++;diveJumpCredit=false;grounded=false;toast('DIVE JUMP — JUMP CONSUMED')}
+   else {diveJumpCredit=false;vel.y=Math.max(vel.y,-1.5);toast('DIVE CANCEL — NO EXTRA JUMP')}
+   vel.x=dashDir.x*48;vel.z=dashDir.z*48
+}else if(hookActive){releaseGrapple(true);vel.y=Math.max(vel.y,8.8);toast('GRAPPLE JUMP RELEASE')}
+else if(activeClass==='glider'&&gliding){
+  if(grounded||jumpsUsed<extraJumps){
+    jumpsUsed++;grounded=false;
+    if(owned.includes('ninjabelt')){glideFlightSpeed=Math.min(90,glideFlightSpeed+13);vel.y=Math.max(vel.y,7);toast('NINJA BELT — GLIDE BOOST')}
+    else{gliding=false;glideWings.visible=false;vel.y=Math.max(vel.y,12.9*(1+jumpBonus));toast('GLIDE CANCELLED — JUMP')}
+  }
+}else if(activeClass==='glider'&&glideBonked&&!owned.includes('helmet')){toast('BONKED — LAND BEFORE JUMPING')}
+else if(grounded||jumpsUsed<extraJumps+(activeClass==='wanted'?2:0)){gliding=false;vel.y=12.9*(1+jumpBonus)*(activeClass==='wanted'?1.12:spiritActive?1.26:1);grounded=false;jumpsUsed++}}});
+addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='KeyE')releaseAbility()});
+addEventListener('blur',()=>{for(const k in keys)keys[k]=false;mouseDown=false;releaseAbility()});
+renderer.domElement.addEventListener('pointerdown',e=>{mouseDown=true;dragX=e.clientX;dragY=e.clientY;if(shiftLock&&started&&!paused)renderer.domElement.requestPointerLock?.()});addEventListener('pointerup',()=>mouseDown=false);
+addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0035;pitch=THREE.MathUtils.clamp(pitch+e.movementY*.0029,-1.43,1.35)}else if(mouseDown){yaw-=(e.clientX-dragX)*.005;pitch=THREE.MathUtils.clamp(pitch+(e.clientY-dragY)*.005,-1.43,1.35);dragX=e.clientX;dragY=e.clientY}});
+renderer.domElement.addEventListener('wheel',e=>{dist=THREE.MathUtils.clamp(dist+Math.sign(e.deltaY)*1.2,7,26)},{passive:true});
+$('start').onclick=()=>{activeClass=$('classSelect').value;difficulty=$('difficulty').value;dashCharge=1;diveActive=false;diveCooldown=0;diveAvailable=true;diveRecovery=0;grappleCarry=0;diveJumpCredit=false;chargeActive=false;chargeRecovery=0;spiritActive=false;gliding=false;glideFlightSpeed=0;glideBonkCooldown=0;glideBoostCooldown=0;glideBonked=false;glideWings.visible=false;stopHook();$('classTag').textContent=activeClass.toUpperCase()+' · '+difficulty.toUpperCase();$('abilityname').textContent=({charger:'CHARGE',diver:'DIVE',glider:'GLIDE',grappler:'GRAPPLE',spirit:'SPIRIT',wanted:'STOP',prisoner:'NONE'})[activeClass];resetRun();started=true;paused=false;$('veil').classList.add('hidden');renderer.domElement.requestPointerLock?.()};
+function updateCam(dt){let target=p.clone().add(new V(0,2,0));let offset=new V(Math.sin(yaw)*Math.cos(pitch)*dist,Math.sin(pitch)*dist+2,Math.cos(yaw)*Math.cos(pitch)*dist);let want=target.clone().add(offset);camera.position.lerp(want,Math.min(1,dt*8));camera.lookAt(target)}
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+const minimap=$('minimap'),mapctx=minimap.getContext('2d');let mapTick=0,minimapCellSize=9;
+function drawMinimap(){const c=mapctx,W=minimap.width,H=minimap.height;c.clearRect(0,0,W,H);c.fillStyle='#06091de9';c.fillRect(0,0,W,H);const cell=minimapCellSize;const toX=x=>W/2+x*cell,toY=z=>H/2+z*cell;
+c.strokeStyle='#333454';c.lineWidth=1;c.beginPath();c.moveTo(W/2,0);c.lineTo(W/2,H);c.moveTo(0,H/2);c.lineTo(W,H/2);c.stroke();
+for(const t of tiles){let x=toX(t.x)-cell*.45,y=toY(t.z)-cell*.45;c.fillStyle=!t.active?'#211025':t.hub?'#9e85bf':phase==='collapse'&&collapseTime>t.collapseAt-3?'#ff6d76':t.y>1?'#8585b9':t.y< -1?'#33425d':'#4b5374';c.fillRect(x,y,cell*.90,cell*.90)}
+for(const g of presents){if(g.found||!g.tile.active)continue;c.beginPath();c.arc(toX(g.group.position.x/tileSize),toY(g.group.position.z/tileSize),Math.max(2,cell*.27),0,Math.PI*2);c.fillStyle=g.golden?'#ffe17f':'#d9a6ff';c.fill()}
+for(const j of jumpPads){if(!j.tile.active)continue;c.fillStyle='#3d9cfa';c.fillRect(toX(j.mesh.position.x/tileSize)-3,toY(j.mesh.position.z/tileSize)-3,6,6)}for(const mine of tripmines){if(!mine.armed||!mine.tile.active)continue;c.fillStyle='#ff4cff';c.fillRect(toX(mine.mesh.position.x/tileSize)-3,toY(mine.mesh.position.z/tileSize)-3,6,6)}for(const e of mobs){c.fillStyle='#ff5a72';c.beginPath();c.arc(toX(e.mesh.position.x/tileSize),toY(e.mesh.position.z/tileSize),3.4,0,Math.PI*2);c.fill()}
+c.beginPath();c.arc(toX(p.x/tileSize),toY(p.z/tileSize),5.1,0,Math.PI*2);c.fillStyle='#8dfbff';c.fill();c.strokeStyle='#e2fdff';c.lineWidth=1.6;c.stroke();c.font='bold 10px Arial';c.fillStyle=phase==='collapse'?'#eac172':'#bdaddb';c.fillText(phase==='collapse'?'COLLAPSE':'GIFTS '+got+'/'+total,8,15)}
+const clock=new THREE.Clock();generate();let accumulator=0;function animate(){requestAnimationFrame(animate);let dt=Math.min(.05,clock.getDelta());animateCollapseShards(dt);if(msgTimeout>0){msgTimeout-=dt;if(msgTimeout<=0)$('flash').style.opacity=0}deco.rotation.y+=dt*.008;farObjects.rotation.y+=dt*.003;beaconCrown.rotation.y+=dt*.55;beaconCore.rotation.y+=dt*.25;for(const spike of beaconSpikes)spike.material.emissiveIntensity=phase==='collapse'?1.15:.35;stride+=dt*10;for(let i=0;i<limbs.length;i++)limbs[i].rotation.x=Math.sin(stride+(i%2)*Math.PI)*(grounded?Math.min(1,vel.length()/11)*.3:.04)*(i<2?1:-1);portal.rotation.y+=dt*.06;portalInner.rotation.y-=dt*.08;for(let i=0;i<beaconRays.length;i++){beaconRays[i].material.opacity=phase==='collapse'?(0.14+i*.03)+0.06*Math.sin(performance.now()*.0035+i):0;}ring.material.opacity=phase==='collapse'?.42:0;ring2.material.opacity=phase==='collapse'?.34:0;ring3.material.opacity=phase==='collapse'?.28:0;beaconBeam.material.opacity=phase==='collapse'?.40+.06*Math.sin(performance.now()*.003):0;beamCore.material.opacity=phase==='collapse'?.86+.10*Math.sin(performance.now()*.0042):0;beacon.position.y=.02*Math.sin(performance.now()*.0011);if(started&&!paused){accumulator+=dt;let steps=0;while(accumulator>=1/90&&steps<5){simulate(1/90);accumulator-=1/90;steps++}if(steps===5)accumulator=0}updateCam(dt);mapTick+=dt;if(mapTick>.16){drawMinimap();mapTick=0}renderer.render(scene,camera)}animate();
+</script></body></html>
